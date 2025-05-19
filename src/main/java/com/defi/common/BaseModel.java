@@ -1,4 +1,4 @@
-package com.defi.auth.common;
+package com.defi.common;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,8 @@
 package com.defi.auth.user.service.impl;
 
+import com.defi.common.CommonMessage;
 import com.defi.auth.user.dto.AdminCreateUserRequest;
-import com.defi.auth.user.dto.AdminUpdateUserRequest;
+import com.defi.auth.user.dto.UpdateUserRequest;
 import com.defi.auth.user.entity.User;
 import com.defi.auth.user.entity.UserCredential;
 import com.defi.auth.user.entity.UserCredentialId;
@@ -9,16 +10,18 @@ import com.defi.auth.user.mapper.UserMapper;
 import com.defi.auth.user.repository.UserCredentialRepository;
 import com.defi.auth.user.repository.UserRepository;
 import com.defi.auth.user.service.AdminUserService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -31,10 +34,17 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final UserMapper userMapper;
 
     @Override
+    public List<User> listUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).getContent();
+    }
+
+    @Override
     @Transactional
     public User createUser(AdminCreateUserRequest request) {
-        if (userRepository.existsByUserName(request.getUserName())) {
-            throw new IllegalArgumentException("Username already exists");
+        if (userRepository.existsByUserName(request.getUserName())
+        || userRepository.existsByEmail(request.getEmail())
+        || userRepository.existsByPhone(request.getPhone())) {
+            throw new ResponseStatusException(CONFLICT, CommonMessage.EXISTING);
         }
 
         User user = userMapper.toUser(request);
@@ -64,7 +74,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public User updateUser(Long id, AdminUpdateUserRequest request) {
+    public User updateUser(Long id, UpdateUserRequest request) {
         User user = getUser(id);
         userMapper.updateUser(user, request);
         return userRepository.save(user);
@@ -84,10 +94,16 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void updatePassword(Long userId, String newPassword) {
         UserCredentialId id = new UserCredentialId(userId, "password");
         UserCredential credential = credentialRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Password credential not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, CommonMessage.NOT_FOUND));
         credential.setSecretData(passwordEncoder.encode(newPassword));
         credentialRepository.save(credential);
+    }
+
+    public void updateMetadata(Long id, ObjectNode metadata) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, CommonMessage.NOT_FOUND));
+        user.setMetadata(metadata);
+        userRepository.save(user);
     }
 
     @Override
@@ -96,12 +112,11 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         if (isLocked) {
             user.setLocked(true);
-            user.setLockedUntil(lockedUntil == 0 ? 0 : lockedUntil);
+            user.setLockedUntil(lockedUntil);
         } else {
             user.setLocked(false);
             user.setLockedUntil(null);
         }
-
         userRepository.save(user);
     }
 }

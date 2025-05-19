@@ -29,30 +29,28 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("com.github.f4b6a3:uuid-creator:6.0.0")
+
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	implementation("org.flywaydb:flyway-core")
-	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
+	implementation("org.flywaydb:flyway-core:11.8.2")
+	runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.2")
+	runtimeOnly("org.postgresql:postgresql:42.7.5")
+	implementation("io.hypersistence:hypersistence-utils-hibernate-60:3.9.4")
 
-	// lombok test
-	testCompileOnly ("org.projectlombok:lombok")
-	testAnnotationProcessor ("org.projectlombok:lombok")
+
+	compileOnly("org.projectlombok:lombok:1.18.38")
 	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+	annotationProcessor("org.projectlombok:lombok:1.18.38")
+	implementation("org.mapstruct:mapstruct:1.6.3")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
 	// unit test
 	testImplementation("org.mockito:mockito-core:5.12.0")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
-
-	// MapStruct
-	implementation("org.mapstruct:mapstruct:1.5.5.Final")
-	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 }
 
 tasks.withType<Test> {

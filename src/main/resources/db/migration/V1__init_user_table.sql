@@ -12,7 +12,9 @@ CREATE TABLE users (
     phone_verified BOOLEAN NOT NULL,
 
     locked BOOLEAN NOT NULL,
-    locked_until BIGINT
+    locked_until BIGINT,
+
+    metadata JSONB
 );
 
 CREATE TABLE user_credentials (

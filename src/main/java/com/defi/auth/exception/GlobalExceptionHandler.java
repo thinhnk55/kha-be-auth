@@ -1,5 +1,7 @@
 package com.defi.auth.exception;
 
+import com.defi.common.BaseResponse;
+import com.defi.common.CommonMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,29 +19,31 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
-        Map<String, Object> errors = Map.of("error", ex.getMessage());
-        return new ResponseEntity<>(errors, ex.getStatusCode());
+    public ResponseEntity<BaseResponse<?>> handleResponseStatusException(ResponseStatusException ex) {
+        BaseResponse<?> response = BaseResponse.of(ex.getStatusCode().value(),
+                ex.getBody().getDetail());
+        return new ResponseEntity<>(response, ex.getStatusCode());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex,
-            WebRequest request) {
+    public ResponseEntity<BaseResponse<?>> handleValidationExceptions(MethodArgumentNotValidException ex,
+                                                                   WebRequest request) {
         Map<String, Object> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             String fieldName = error.getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        BaseResponse<?> response = BaseResponse.of(ex.getStatusCode().value(),
+                ex.getBody().getDetail(), errors);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex,
+    public ResponseEntity<BaseResponse<?>> handleAllExceptions(Exception ex,
             WebRequest request) {
         Map<String, Object> errors = new HashMap<>();
-        errors.put("error", "internal_server");
-        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
+        errors.put("error", CommonMessage.INTERNAL_SERVER);
+        return new ResponseEntity<>(BaseResponse.of(errors), HttpStatus.BAD_REQUEST);
     }
 }
