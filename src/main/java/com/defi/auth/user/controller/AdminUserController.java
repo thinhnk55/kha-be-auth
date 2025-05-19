@@ -43,13 +43,13 @@ public class AdminUserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         adminUserService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/password")
     public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordRequest req) {
         adminUserService.updatePassword(id, req.getNewPassword());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/metadata")
@@ -58,13 +58,13 @@ public class AdminUserController {
             @RequestBody UpdateMetadataRequest req
     ) {
         adminUserService.updateMetadata(id, req.getMetadata());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/lock")
     public ResponseEntity<?> lock(@PathVariable Long id, @RequestBody LockAccountRequest req) {
         adminUserService.lockUser(id, req.isLocked(), req.getLockedUntil());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping

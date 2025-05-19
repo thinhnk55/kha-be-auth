@@ -44,13 +44,13 @@ public class AdminGroupController {
     @PutMapping("/{id}/metadata")
     public ResponseEntity<BaseResponse<Void>> updateMetadata(@PathVariable Long id, @RequestBody UpdateGroupMetadataRequest req) {
         groupService.updateMetadata(id, req);
-        return ResponseEntity.ok(BaseResponse.of((Void) null));
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id) {
         groupService.deleteGroup(id);
-        return ResponseEntity.ok(BaseResponse.of((Void) null));
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
@@ -75,7 +75,7 @@ public class AdminGroupController {
             @PathVariable Long userId
     ) {
         groupService.addUserToGroup(userId, groupId);
-        return ResponseEntity.ok(BaseResponse.of((Void) null));
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{groupId}/users/{userId}")
@@ -84,6 +84,6 @@ public class AdminGroupController {
             @PathVariable Long userId
     ) {
         groupService.removeUserFromGroup(userId, groupId);
-        return ResponseEntity.ok(BaseResponse.of((Void) null));
+        return ResponseEntity.ok().build();
     }
 }
