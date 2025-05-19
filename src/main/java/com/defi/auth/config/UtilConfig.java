@@ -12,8 +12,4 @@ public class UtilConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    UUIDGenerator uuidGenerator() {
-        return new UUIDGenerator();
-    }
 }

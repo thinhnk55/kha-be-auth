@@ -1,10 +1,14 @@
 package com.defi.auth.user.entity;
 
-import com.defi.auth.common.BaseModel;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.defi.common.BaseModel;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "users")
@@ -30,4 +34,9 @@ public class User extends BaseModel {
     private boolean locked;
 
     private Long lockedUntil;
+
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private ObjectNode metadata;
 }
