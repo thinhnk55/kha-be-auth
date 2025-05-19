@@ -19,6 +19,9 @@
 1. Mở terminal v khởi động docker compose -f docker-compose-for-dev.yaml up để chạy postgres và redis
 2. Sau đó chạy main từ class com.defi.Main thì sẽ có thể kết nối vào postgres và redis trên.
 
+# Hướng dẫn Response:
+Dùng chung BaseResponse, tuân thủ các mã lỗi và message.  
+
 # Hướng dẫn throw Exceptions trong Service
 1. Exception ném ra phải là ResponseStatusException với HttpStatus phù hợp
 2. Ví dụ
