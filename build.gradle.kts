@@ -48,6 +48,7 @@ dependencies {
 	implementation("org.mapstruct:mapstruct:1.6.3")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
+	implementation("com.nimbusds:nimbus-jose-jwt:10.3")
 	// unit test
 	testImplementation("org.mockito:mockito-core:5.12.0")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
