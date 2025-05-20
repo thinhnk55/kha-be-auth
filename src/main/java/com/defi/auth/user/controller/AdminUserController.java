@@ -22,7 +22,7 @@ public class AdminUserController {
 
     @PostMapping
     public ResponseEntity<BaseResponse<User>> create(
-            @RequestBody @Valid AdminCreateUserRequest req
+            @RequestBody @Valid CreateUserRequest req
     ) {
         User user = adminUserService.createUser(req);
         return ResponseEntity.ok(BaseResponse.of(user));

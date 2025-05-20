@@ -10,6 +10,5 @@ public interface TokenService {
                          String subjectID, String subjectName, List<Integer> roles,
                          List<Integer> groups, long timeToLive);
     String refreshToken(Token token, int timeToLive);
-    boolean validateToken(String token);
     Token parseToken(String token);
 }

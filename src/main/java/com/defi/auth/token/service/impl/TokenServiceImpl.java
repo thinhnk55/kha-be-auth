@@ -1,10 +1,10 @@
-package com.defi.auth.token;
+package com.defi.auth.token.service.impl;
 
 import com.defi.auth.token.entity.ClaimField;
 import com.defi.auth.token.entity.SubjectType;
 import com.defi.auth.token.entity.Token;
 import com.defi.auth.token.entity.TokenType;
-import com.defi.auth.token.helper.RSAKeyUtil;
+import com.defi.auth.token.service.TokenService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -13,14 +13,13 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -37,38 +36,17 @@ import java.util.stream.Collectors;
  *     <li>Validating and parsing existing tokens</li>
  * </ul>
  */
-public class TokenService {
-    private RSAPrivateKey privateKey;
-    private RSAPublicKey publicKey;
 
-    private RSASSASigner signer;
-    private RSASSAVerifier verifier;
 
-    /**
-     * Private constructor for singleton pattern.
-     */
-    private TokenService() {
-    }
-
-    /**
-     * Initializes the token manager with public and private keys in PEM format.
-     *
-     * @param publicKeyPem  the PEM string of the public key
-     * @param privateKeyPem the PEM string of the private key
-     * @param paraphrase    the private key passphrase
-     * @throws Exception if the keys cannot be loaded or are invalid
-     */
-    public void init(String publicKeyPem, String privateKeyPem, String paraphrase) throws Exception {
-        this.publicKey = RSAKeyUtil.readRSAPublicKeyFromPEM(publicKeyPem);
-        this.privateKey = RSAKeyUtil.readRSAPrivateKeyFromPEM(privateKeyPem, paraphrase);
-        this.signer = new RSASSASigner(privateKey);
-        this.verifier = new RSASSAVerifier(publicKey);
-    }
-
+@Service
+@RequiredArgsConstructor
+public class TokenServiceImpl implements TokenService {
+    private final RSASSASigner signer;
+    private final  RSASSAVerifier verifier;
     /**
      * Generates a signed JWT access token with the provided session and subject details.
      *
-     * @param sessionId    the session UUID
+     * @param sessionId    the session
      * @param type         the token type (e.g., access, refresh)
      * @param subjectID    the ID of the subject (usually user ID)
      * @param subjectName  the display name or username of the subject
@@ -77,8 +55,8 @@ public class TokenService {
      * @param timeToLive   token TTL in seconds
      * @return a signed JWT string
      */
-    public String generateToken(UUID sessionId, TokenType type,
-                                UUID subjectID, String subjectName, List<Integer> roles,
+    public String generateToken(String sessionId, TokenType type,
+                                String subjectID, String subjectName, List<Integer> roles,
                                 List<Integer> groups, long timeToLive) {
         long issuedAt = Instant.now().getEpochSecond();
         Token token = Token.builder()
@@ -190,9 +168,9 @@ public class TokenService {
             long expiresAt = claims.getExpirationTime().toInstant().getEpochSecond();
 
             return Token.builder()
-                    .sessionId(UUID.fromString((String) claims.getClaim(ClaimField.ID.getName())))
+                    .sessionId( (String) claims.getClaim(ClaimField.ID.getName()))
                     .tokenType(TokenType.forName((String) claims.getClaim(ClaimField.TYPE.getName())))
-                    .subjectId(UUID.fromString(claims.getSubject()))
+                    .subjectId((String) claims.getSubject())
                     .subjectName((String) claims.getClaim(ClaimField.SUBJECT_NAME.getName()))
                     .subjectType(SubjectType.forName((String) claims.getClaim(ClaimField.SUBJECT_TYPE.getName())))
                     .roles(roles.stream()

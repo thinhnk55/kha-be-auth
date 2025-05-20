@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class AdminCreateUserRequest {
+public class CreateUserRequest {
     @NotBlank(message = CommonMessage.INVALID)
     @Size(min = 3, max = 50, message = CommonMessage.INVALID)
     private String userName;

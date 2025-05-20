@@ -8,7 +8,7 @@ import jakarta.persistence.Converter;
 @Converter(autoApply = false)
 public class ObjectNodeConverter implements AttributeConverter<ObjectNode, String> {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
 
     @Override
     public String convertToDatabaseColumn(ObjectNode objectNode) {
