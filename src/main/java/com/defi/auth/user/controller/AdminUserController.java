@@ -1,5 +1,6 @@
 package com.defi.auth.user.controller;
 
+import com.defi.auth.casbin.CasbinAuthorize;
 import com.defi.auth.user.dto.*;
 import com.defi.common.BaseResponse;
 import com.defi.common.Pagination;
@@ -69,6 +70,7 @@ public class AdminUserController {
     }
 
     @GetMapping
+    @CasbinAuthorize(domain= "*", resource = "users", action = "read")
     public ResponseEntity<BaseResponse<List<User>>> listUsers(
             @PageableDefault Pageable pageable
     ) {

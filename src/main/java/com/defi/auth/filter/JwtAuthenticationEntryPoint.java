@@ -5,6 +5,7 @@ import com.defi.common.CommonMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -13,18 +14,18 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
+@AllArgsConstructor
 public class JwtAuthenticationEntryPoint  implements AuthenticationEntryPoint {
-    private ObjectMapper mapper;
-
+    private final ObjectMapper mapper;
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
+    public void commence(HttpServletRequest req,
+                         HttpServletResponse res,
                          AuthenticationException authException) throws IOException {
 
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.setContentType("application/json;charset=UTF-8");
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         BaseResponse<?> baseResponse = BaseResponse.of(HttpStatus.UNAUTHORIZED.value()
                 , CommonMessage.UNAUTHORIZED);
-        response.getWriter().write(mapper.writeValueAsString(baseResponse));
+        res.getWriter().write(mapper.writeValueAsString(baseResponse));
     }
 }

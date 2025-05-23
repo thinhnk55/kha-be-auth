@@ -155,6 +155,9 @@ public class TokenServiceImpl implements TokenService {
      */
     public Token parseToken(String token) {
         try {
+            if(token == null){
+                return null;
+            }
             SignedJWT signedJWT = SignedJWT.parse(token);
             if (!validateToken(signedJWT)) {
                 return null;
@@ -170,7 +173,7 @@ public class TokenServiceImpl implements TokenService {
             return Token.builder()
                     .sessionId( (String) claims.getClaim(ClaimField.ID.getName()))
                     .tokenType(TokenType.forName((String) claims.getClaim(ClaimField.TYPE.getName())))
-                    .subjectId((String) claims.getSubject())
+                    .subjectId(claims.getSubject())
                     .subjectName((String) claims.getClaim(ClaimField.SUBJECT_NAME.getName()))
                     .subjectType(SubjectType.forName((String) claims.getClaim(ClaimField.SUBJECT_TYPE.getName())))
                     .roles(roles.stream()
