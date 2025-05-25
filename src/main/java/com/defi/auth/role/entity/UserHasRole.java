@@ -7,10 +7,10 @@ import lombok.*;
 @Table(name = "user_role_in_group")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
-public class UserRoleInGroup {
+public class UserHasRole {
 
     @EmbeddedId
-    private UserRoleInGroupId id;
+    private UserHasRoleId id;
 
     private Long assignedAt;
 

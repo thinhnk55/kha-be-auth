@@ -8,8 +8,6 @@ public class PermissionRequest {
     @NotNull
     private Long roleId;
     @NotNull
-    private Long groupId;
-    @NotNull
     private Long resourceId;
     @NotNull
     private Long actionId;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/permissions/actions")
+@RequestMapping("/auth/v1/admin/permissions/actions")
 @RequiredArgsConstructor
 public class ActionController {
 

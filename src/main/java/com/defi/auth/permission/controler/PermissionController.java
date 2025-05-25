@@ -4,18 +4,15 @@ import com.defi.auth.permission.dto.PermissionDto;
 import com.defi.auth.permission.dto.PermissionRequest;
 import com.defi.auth.permission.service.PermissionService;
 import com.defi.common.BaseResponse;
-import com.defi.common.CommonMessage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/permissions")
+@RequestMapping("/auth/v1/admin/permissions")
 @RequiredArgsConstructor
 public class PermissionController {
 
@@ -26,19 +23,20 @@ public class PermissionController {
         return ResponseEntity.ok(BaseResponse.of(permissionService.findAll()));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<PermissionDto>> getById(@PathVariable Long id) {
-        return permissionService.findById(id)
-                .map(permission -> ResponseEntity.ok(BaseResponse.of(permission)))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
+
+    @GetMapping("/by-role/{roleId}")
+    public ResponseEntity<BaseResponse<List<PermissionDto>>> findByRoleId(
+            @PathVariable Long roleId
+    ) {
+        List<PermissionDto> result = permissionService.findByRoleId(roleId);
+        return ResponseEntity.ok(BaseResponse.of(result));
     }
 
-    @GetMapping("/by-role-group")
-    public ResponseEntity<BaseResponse<List<PermissionDto>>> findByRoleAndGroup(
-            @RequestParam(required = false) Long roleId,
-            @RequestParam(required = false) Long groupId
+    @GetMapping("/by-resource/{resourceId}")
+    public ResponseEntity<BaseResponse<List<PermissionDto>>> findByResourceId(
+            @PathVariable Long resourceId
     ) {
-        List<PermissionDto> result = permissionService.findByRoleAndGroup(roleId, groupId);
+        List<PermissionDto> result = permissionService.findByResourceId(resourceId);
         return ResponseEntity.ok(BaseResponse.of(result));
     }
 

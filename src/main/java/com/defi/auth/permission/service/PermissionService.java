@@ -11,7 +11,7 @@ public interface PermissionService {
     Optional<PermissionDto> findById(Long id);
     PermissionDto create(PermissionRequest request);
     void delete(Long id);
-    Optional<PermissionDto> findByUnique(Long roleId, Long groupId, Long resourceId, Long actionId);
+    List<PermissionDto> findByRoleId(Long roleId);
 
-    List<PermissionDto> findByRoleAndGroup(Long roleId, Long groupId);
+    List<PermissionDto> findByResourceId(Long resourceId);
 }

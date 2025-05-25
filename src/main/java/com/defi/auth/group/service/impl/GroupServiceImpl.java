@@ -1,7 +1,7 @@
 package com.defi.auth.group.service.impl;
 
 import com.defi.auth.group.dto.CreateGroupRequest;
-import com.defi.auth.group.dto.GroupDTO;
+import com.defi.auth.group.dto.GroupDto;
 import com.defi.auth.group.dto.UpdateGroupMetadataRequest;
 import com.defi.auth.group.dto.UpdateGroupRequest;
 import com.defi.auth.group.entity.Group;
@@ -32,7 +32,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMapper groupMapper;
 
     @Override
-    public GroupDTO createGroup(CreateGroupRequest req) {
+    public GroupDto createGroup(CreateGroupRequest req) {
         if (groupRepository.existsByParentIdAndCode(req.getParentId(), req.getCode())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
         }
@@ -44,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
 
 
     @Override
-    public GroupDTO updateGroup(Long id, UpdateGroupRequest req) {
+    public GroupDto updateGroup(Long id, UpdateGroupRequest req) {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
         group.setName(req.getName());
@@ -66,14 +66,14 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupDTO getGroup(Long id) {
+    public GroupDto getGroup(Long id) {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
         return groupMapper.toDTO(group);
     }
 
     @Override
-    public List<GroupDTO> findAll() {
+    public List<GroupDto> findAll() {
         List<Group> groups = groupRepository.findAll();
         return groups.stream().map(groupMapper::toDTO).toList();
     }

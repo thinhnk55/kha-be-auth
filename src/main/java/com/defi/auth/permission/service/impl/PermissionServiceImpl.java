@@ -39,8 +39,8 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional
     public PermissionDto create(PermissionRequest request) {
-        if (permissionRepository.existsByRoleIdAndGroupIdAndResourceIdAndActionId(
-                request.getRoleId(), request.getGroupId(), request.getResourceId(), request.getActionId())) {
+        if (permissionRepository.existsByRoleIdAndResourceIdAndActionId(
+                request.getRoleId(), request.getResourceId(), request.getActionId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
         }
         Permission permission = permissionMapper.toEntity(request);
@@ -58,14 +58,13 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Optional<PermissionDto> findByUnique(Long roleId, Long groupId, Long resourceId, Long actionId) {
-        return permissionRepository.findByRoleIdAndGroupIdAndResourceIdAndActionId(roleId, groupId, resourceId, actionId)
-                .map(permissionMapper::toDto);
+    public List<PermissionDto> findByRoleId(Long roleId) {
+        return permissionRepository.findByRoleId(roleId)
+                .stream().map(permissionMapper::toDto).toList();
     }
-
     @Override
-    public List<PermissionDto> findByRoleAndGroup(Long roleId, Long groupId){
-        return permissionRepository.findByRoleIdAndGroupId(roleId, groupId)
+    public List<PermissionDto> findByResourceId(Long resourceId) {
+        return permissionRepository.findByResourceId(resourceId)
                 .stream().map(permissionMapper::toDto).toList();
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/admin/roles")
+@RequestMapping("/auth/v1/admin/roles")
 @RequiredArgsConstructor
 public class AdminRoleController {
 

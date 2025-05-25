@@ -1,7 +1,7 @@
 package com.defi.auth.group.mapper;
 
 import com.defi.auth.group.dto.CreateGroupRequest;
-import com.defi.auth.group.dto.GroupDTO;
+import com.defi.auth.group.dto.GroupDto;
 import com.defi.auth.group.entity.Group;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,5 +15,5 @@ public interface GroupMapper {
     @Mapping(target = "id", ignore = true)
     Group fromCreateRequest(CreateGroupRequest req);
 
-    GroupDTO toDTO(Group group);
+    GroupDto toDTO(Group group);
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/admin/users")
+@RequestMapping("/auth/v1/admin/users")
 @RequiredArgsConstructor
 public class AdminUserController {
 
@@ -70,7 +70,7 @@ public class AdminUserController {
     }
 
     @GetMapping
-    @CasbinAuthorize(domain= "*", resource = "users", action = "read")
+    @CasbinAuthorize(resource = "users", action = "read")
     public ResponseEntity<BaseResponse<List<User>>> listUsers(
             @PageableDefault Pageable pageable
     ) {

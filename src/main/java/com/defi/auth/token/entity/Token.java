@@ -40,12 +40,12 @@ public class Token {
     /**
      * List of role IDs granted to the subject.
      */
-    private List<Integer> roles;
+    private List<String> roles;
 
     /**
      * List of group IDs the subject belongs to.
      */
-    private List<Integer> groups;
+    private List<String> groups;
 
     /**
      * Issued-at time in seconds since epoch.

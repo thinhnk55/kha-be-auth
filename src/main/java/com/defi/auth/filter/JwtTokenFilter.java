@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,7 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
     public Authentication getAuthentication(Token token) {
         UserDetails userDetails = User
-                .withUsername(token.getSubjectName())
+                .withUsername(token.getSubjectId())
                 .password("")
                 .authorities(token.getRoles().stream()
                         .map(String::valueOf).toList()

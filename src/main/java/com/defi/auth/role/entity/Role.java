@@ -14,6 +14,7 @@ import org.hibernate.type.SqlTypes;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class Role extends BaseModel {
+    private Long groupId;
     private String code;
     private String name;
 

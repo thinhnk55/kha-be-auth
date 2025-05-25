@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS groups (
     CONSTRAINT uq_groups_parent_code
         UNIQUE (parent_id, code)
 );
-
-CREATE INDEX IF NOT EXISTS idx_groups_parent_id ON groups(parent_id);
+-- Hỗ trợ tìm kiếm tất cả các nhóm con
+CREATE INDEX IF NOT EXISTS idx__groups__parent_id ON groups(parent_id);
 
 CREATE TABLE IF NOT EXISTS user_in_group (
     user_id BIGINT NOT NULL,
@@ -31,5 +31,5 @@ CREATE TABLE IF NOT EXISTS user_in_group (
         ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_user_in_group_group_id ON user_in_group(group_id);
-CREATE INDEX IF NOT EXISTS idx_user_in_group_user_id ON user_in_group(user_id);
+CREATE INDEX IF NOT EXISTS idx__user_in_group__group_id ON user_in_group(group_id);
+CREATE INDEX IF NOT EXISTS idx__user_in_group__user_id ON user_in_group(user_id);

@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GroupDTO {
+public class GroupDto {
     private Long id;
     private Long parentId;
     private String code;

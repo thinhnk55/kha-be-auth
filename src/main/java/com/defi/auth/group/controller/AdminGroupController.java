@@ -1,7 +1,7 @@
 package com.defi.auth.group.controller;
 
 import com.defi.auth.group.dto.CreateGroupRequest;
-import com.defi.auth.group.dto.GroupDTO;
+import com.defi.auth.group.dto.GroupDto;
 import com.defi.auth.group.dto.UpdateGroupMetadataRequest;
 import com.defi.auth.group.dto.UpdateGroupRequest;
 import com.defi.auth.group.service.GroupService;
@@ -18,26 +18,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/admin/groups")
+@RequestMapping("/auth/v1/admin/groups")
 @RequiredArgsConstructor
 public class AdminGroupController {
 
     private final GroupService groupService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<GroupDTO>> create(@Valid @RequestBody CreateGroupRequest req) {
-        GroupDTO group = groupService.createGroup(req);
+    public ResponseEntity<BaseResponse<GroupDto>> create(@Valid @RequestBody CreateGroupRequest req) {
+        GroupDto group = groupService.createGroup(req);
         return ResponseEntity.ok(BaseResponse.of(group));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<GroupDTO>> get(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse<GroupDto>> get(@PathVariable Long id) {
         return ResponseEntity.ok(BaseResponse.of(groupService.getGroup(id)));
     }
 
+    @GetMapping()
+    public ResponseEntity<BaseResponse<List<GroupDto>>> findAll(@PathVariable Long id) {
+        List<GroupDto> list = groupService.findAll();
+        return ResponseEntity.ok(BaseResponse.of(list));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<GroupDTO>> update(@PathVariable Long id, @Valid @RequestBody UpdateGroupRequest req) {
-        GroupDTO group = groupService.updateGroup(id, req);
+    public ResponseEntity<BaseResponse<GroupDto>> update(@PathVariable Long id, @Valid @RequestBody UpdateGroupRequest req) {
+        GroupDto group = groupService.updateGroup(id, req);
         return ResponseEntity.ok(BaseResponse.of(group));
     }
 
@@ -54,8 +60,8 @@ public class AdminGroupController {
     }
 
     @GetMapping
-    public ResponseEntity<BaseResponse<List<GroupDTO>>> findAll() {
-        List<GroupDTO> groups = groupService.findAll();
+    public ResponseEntity<BaseResponse<List<GroupDto>>> findAll() {
+        List<GroupDto> groups = groupService.findAll();
         return ResponseEntity.ok(BaseResponse.of(groups));
     }
 

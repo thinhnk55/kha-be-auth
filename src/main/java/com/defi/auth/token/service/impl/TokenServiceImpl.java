@@ -56,8 +56,8 @@ public class TokenServiceImpl implements TokenService {
      * @return a signed JWT string
      */
     public String generateToken(String sessionId, TokenType type,
-                                String subjectID, String subjectName, List<Integer> roles,
-                                List<Integer> groups, long timeToLive) {
+                                String subjectID, String subjectName, List<String> roles,
+                                List<String> groups, long timeToLive) {
         long issuedAt = Instant.now().getEpochSecond();
         Token token = Token.builder()
                 .sessionId(sessionId)
@@ -164,8 +164,16 @@ public class TokenServiceImpl implements TokenService {
             }
 
             JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
-            List<Object> roles = claims.getListClaim(ClaimField.ROLES.getName());
-            List<Object> groups = claims.getListClaim(ClaimField.GROUPS.getName());
+
+            List<String> roles = claims.getListClaim(ClaimField.ROLES.getName())
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+
+            List<String> groups = claims.getListClaim(ClaimField.GROUPS.getName())
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
 
             long issuedAt = claims.getIssueTime().toInstant().getEpochSecond();
             long expiresAt = claims.getExpirationTime().toInstant().getEpochSecond();
@@ -176,14 +184,8 @@ public class TokenServiceImpl implements TokenService {
                     .subjectId(claims.getSubject())
                     .subjectName((String) claims.getClaim(ClaimField.SUBJECT_NAME.getName()))
                     .subjectType(SubjectType.forName((String) claims.getClaim(ClaimField.SUBJECT_TYPE.getName())))
-                    .roles(roles.stream()
-                            .filter(Integer.class::isInstance)
-                            .map(Integer.class::cast)
-                            .collect(Collectors.toList()))
-                    .groups(groups.stream()
-                            .filter(Integer.class::isInstance)
-                            .map(Integer.class::cast)
-                            .collect(Collectors.toList()))
+                    .roles(roles)
+                    .groups(groups)
                     .iat(issuedAt)
                     .exp(expiresAt)
                     .build();

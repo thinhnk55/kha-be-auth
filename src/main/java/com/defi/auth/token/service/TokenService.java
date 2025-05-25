@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface TokenService {
     String generateToken(String sessionId, TokenType type,
-                         String subjectID, String subjectName, List<Integer> roles,
-                         List<Integer> groups, long timeToLive);
+                         String subjectID, String subjectName,  List<String> roles,
+                         List<String> groups, long timeToLive);
     String refreshToken(Token token, int timeToLive);
     Token parseToken(String token);
 }

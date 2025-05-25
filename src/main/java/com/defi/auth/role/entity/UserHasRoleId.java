@@ -11,8 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRoleInGroupId implements java.io.Serializable {
+public class UserHasRoleId implements java.io.Serializable {
     private Long userId;
     private Long roleId;
-    private Long groupId;
 }
