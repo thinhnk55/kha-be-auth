@@ -11,6 +11,8 @@ public final class CommonMessage {
     public static final String SUCCESS = "success";
     public static final String FAIL = "fail";
     public static final String INTERNAL_SERVER = "internal_server";
+    public static final String LIMIT = "limit";
+    public static final String LOCKED = "locked";
 
-    private CommonMessage() {} // Không cho khởi tạo
+    private CommonMessage() {}
 }

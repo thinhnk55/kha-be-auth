@@ -1,7 +1,6 @@
 package com.defi.auth.user.service.impl;
 
-import com.defi.common.CommonMessage;
-import com.defi.auth.user.dto.AdminCreateUserRequest;
+import com.defi.auth.user.dto.CreateUserRequest;
 import com.defi.auth.user.dto.UpdateUserRequest;
 import com.defi.auth.user.entity.User;
 import com.defi.auth.user.entity.UserCredential;
@@ -10,6 +9,7 @@ import com.defi.auth.user.mapper.UserMapper;
 import com.defi.auth.user.repository.UserCredentialRepository;
 import com.defi.auth.user.repository.UserRepository;
 import com.defi.auth.user.service.AdminUserService;
+import com.defi.common.CommonMessage;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     @Transactional
-    public User createUser(AdminCreateUserRequest request) {
+    public User createUser(CreateUserRequest request) {
         if (userRepository.existsByUserName(request.getUserName())
         || userRepository.existsByEmail(request.getEmail())
         || userRepository.existsByPhone(request.getPhone())) {

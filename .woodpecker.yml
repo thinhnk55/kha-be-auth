@@ -1,0 +1,55 @@
+steps:
+  debug:
+    image: alpine
+    commands:
+      - echo $CI_WORKSPACE
+      - ls -la $CI_WORKSPACE
+    when:
+      event:
+        - push
+        - pull_request
+      branch:
+        - main
+
+  build:
+    image: gradle:jdk21
+    volumes:
+      - /mount/java:/mount/java
+      - /mount/java/gradle:/home/gradle/.gradle
+    environment:
+      APP_NAME: kha-auth-1.0.0.jar
+      APP_KEY: kha-auth
+    commands:
+      - gradle build extractDependencies -x test --info
+      - mkdir -p build/app/libs build/app/logs build/app/config
+      - cp -r config/* build/app/config/
+      - cp build/libs/$APP_NAME build/app/
+      - cp -r build/dependencies/* build/app/libs/
+      - mkdir -p /mount/java/$APP_KEY/app/logs
+      - chmod -R 777 /mount/java/$APP_KEY/app/logs
+      - cp -r build/app/* /mount/java/$APP_KEY/app/
+    when:
+      event:
+        - push
+        - pull_request
+      branch:
+        - main
+
+  deploy:
+    image: docker:26.1-cli
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mount/java:/mount/java
+    environment:
+      APP_KEY: kha-auth
+    commands:
+      - echo "🚀 Deploying $APP_KEY..."
+      - cp docker-compose.yaml /mount/java/$APP_KEY/
+      - docker compose -f /mount/java/$APP_KEY/docker-compose.yaml down
+      - docker compose -f /mount/java/$APP_KEY/docker-compose.yaml up -d
+    when:
+      event:
+        - push
+        - pull_request
+      branch:
+        - main

@@ -1,6 +1,5 @@
 package com.defi.auth.permission.service.impl;
 
-import com.defi.auth.permission.dto.PermissionDto;
 import com.defi.auth.permission.dto.PermissionRequest;
 import com.defi.auth.permission.entity.Permission;
 import com.defi.auth.permission.mapper.PermissionMapper;
@@ -13,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,27 +22,28 @@ public class PermissionServiceImpl implements PermissionService {
     private final PermissionMapper permissionMapper;
 
     @Override
-    public List<PermissionDto> findAll() {
-        return permissionRepository.findAll().stream()
-                .map(permissionMapper::toDto)
-                .toList();
+    public List<Permission> findAll() {
+        return permissionRepository.findAll();
     }
 
     @Override
-    public Optional<PermissionDto> findById(Long id) {
-        return permissionRepository.findById(id).map(permissionMapper::toDto);
+    public Permission findById(Long id) {
+        return permissionRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND)
+                );
     }
 
     @Override
     @Transactional
-    public PermissionDto create(PermissionRequest request) {
-        if (permissionRepository.existsByRoleIdAndGroupIdAndResourceIdAndActionId(
-                request.getRoleId(), request.getGroupId(), request.getResourceId(), request.getActionId())) {
+    public Permission create(PermissionRequest request) {
+        if (permissionRepository.existsByRoleIdAndResourceIdAndActionId(
+                request.getRoleId(), request.getResourceId(), request.getActionId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
         }
         Permission permission = permissionMapper.toEntity(request);
         permissionRepository.save(permission);
-        return permissionMapper.toDto(permission);
+        return permission;
     }
 
     @Override
@@ -58,14 +56,11 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Optional<PermissionDto> findByUnique(Long roleId, Long groupId, Long resourceId, Long actionId) {
-        return permissionRepository.findByRoleIdAndGroupIdAndResourceIdAndActionId(roleId, groupId, resourceId, actionId)
-                .map(permissionMapper::toDto);
+    public List<Permission> findByRoleCode(Long roleId) {
+        return permissionRepository.findByRoleId(roleId);
     }
-
     @Override
-    public List<PermissionDto> findByRoleAndGroup(Long roleId, Long groupId){
-        return permissionRepository.findByRoleIdAndGroupId(roleId, groupId)
-                .stream().map(permissionMapper::toDto).toList();
+    public List<Permission> findByResourceCode(Long resourceId) {
+        return permissionRepository.findByResourceId(resourceId);
     }
 }

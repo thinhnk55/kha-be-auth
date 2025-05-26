@@ -1,6 +1,6 @@
 package com.defi.auth.user.service;
 
-import com.defi.auth.user.dto.AdminCreateUserRequest;
+import com.defi.auth.user.dto.CreateUserRequest;
 import com.defi.auth.user.dto.UpdateUserRequest;
 import com.defi.auth.user.entity.User;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AdminUserService {
     List<User> listUsers(Pageable pageable);
-    User createUser(AdminCreateUserRequest request);
+    User createUser(CreateUserRequest request);
     User getUser(Long id);
     User updateUser(Long id, UpdateUserRequest request);
     void deleteUser(Long id);

@@ -2,13 +2,13 @@ services:
   kha-app:
     image: eclipse-temurin:21-jre
     ports:
-      - "8002:8080"
+      - "8001:8080"
     working_dir: /app
     volumes:
       - ./app:/app
     environment:
       - SPRING_PROFILES_ACTIVE=sandbox
-    command: ["java", "-cp", "libs/*:kha-portal-1.0.0.jar", "com.defi.Main"]
+    command: ["java", "-cp", "libs/*:kha-auth-1.0.0.jar", "com.defi.Main"]
     restart: unless-stopped
     networks:
       - shared_network

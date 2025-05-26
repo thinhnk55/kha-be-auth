@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/permissions/resources")
+@RequestMapping("/auth/v1/admin/permissions/resources")
 @RequiredArgsConstructor
 public class ResourceController {
 

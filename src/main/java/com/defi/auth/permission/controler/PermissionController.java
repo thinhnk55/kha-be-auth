@@ -1,56 +1,54 @@
 package com.defi.auth.permission.controler;
 
-import com.defi.auth.permission.dto.PermissionDto;
 import com.defi.auth.permission.dto.PermissionRequest;
+import com.defi.auth.permission.entity.Permission;
 import com.defi.auth.permission.service.PermissionService;
 import com.defi.common.BaseResponse;
-import com.defi.common.CommonMessage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/permissions")
+@RequestMapping("/auth/v1/admin/permissions")
 @RequiredArgsConstructor
 public class PermissionController {
 
     private final PermissionService permissionService;
 
     @GetMapping
-    public ResponseEntity<BaseResponse<List<PermissionDto>>> getAll() {
+    public ResponseEntity<BaseResponse<List<Permission>>> getAll() {
         return ResponseEntity.ok(BaseResponse.of(permissionService.findAll()));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<PermissionDto>> getById(@PathVariable Long id) {
-        return permissionService.findById(id)
-                .map(permission -> ResponseEntity.ok(BaseResponse.of(permission)))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
+
+    @GetMapping("/by-role/{roleId}")
+    public ResponseEntity<BaseResponse<List<Permission>>> findByRoleId(
+            @PathVariable Long roleId
+    ) {
+        List<Permission> result = permissionService.findByRoleCode(roleId);
+        return ResponseEntity.ok(BaseResponse.of(result));
     }
 
-    @GetMapping("/by-role-group")
-    public ResponseEntity<BaseResponse<List<PermissionDto>>> findByRoleAndGroup(
-            @RequestParam(required = false) Long roleId,
-            @RequestParam(required = false) Long groupId
+    @GetMapping("/by-resource/{resourceId}")
+    public ResponseEntity<BaseResponse<List<Permission>>> findByResourceCode(
+            @PathVariable Long resourceId
     ) {
-        List<PermissionDto> result = permissionService.findByRoleAndGroup(roleId, groupId);
+        List<Permission> result = permissionService.findByResourceCode(resourceId);
         return ResponseEntity.ok(BaseResponse.of(result));
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse<PermissionDto>> create(@RequestBody @Valid PermissionRequest request) {
-        PermissionDto permission = permissionService.create(request);
+    public ResponseEntity<BaseResponse<Permission>> create(@RequestBody @Valid PermissionRequest request) {
+        Permission permission = permissionService.create(request);
         return ResponseEntity.ok(BaseResponse.of(permission));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<?>> delete(@PathVariable Long id) {
         permissionService.delete(id);
-        return ResponseEntity.ok(BaseResponse.of("deleted"));
+        return ResponseEntity.ok().build();
     }
 }

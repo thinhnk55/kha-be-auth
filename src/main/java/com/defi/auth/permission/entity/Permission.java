@@ -15,7 +15,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Permission extends BaseModel {
     private Long roleId;
-    private Long groupId;
     private Long resourceId;
     private Long actionId;
 }
