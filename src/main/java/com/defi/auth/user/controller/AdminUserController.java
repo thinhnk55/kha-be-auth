@@ -1,51 +1,81 @@
 package com.defi.auth.user.controller;
 
-import com.defi.auth.user.dto.AdminCreateUserRequest;
-import com.defi.auth.user.dto.AdminUpdateUserRequest;
-import com.defi.auth.user.dto.LockAccountRequest;
-import com.defi.auth.user.dto.UpdatePasswordRequest;
+import com.defi.auth.casbin.CasbinAuthorize;
+import com.defi.auth.user.dto.*;
 import com.defi.auth.user.entity.User;
 import com.defi.auth.user.service.AdminUserService;
+import com.defi.common.BaseResponse;
+import com.defi.common.Pagination;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/auth/admin/users")
+@RequestMapping("/auth/v1/admin/users")
 @RequiredArgsConstructor
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
+    @GetMapping
+    @CasbinAuthorize(resource = "users", action = "read")
+    public ResponseEntity<BaseResponse<List<User>>> listUsers(
+            @PageableDefault Pageable pageable
+    ) {
+        List<User> users = adminUserService.listUsers(pageable);
+        Pagination pagination = Pagination.of(pageable);
+        return ResponseEntity.ok(BaseResponse.of(users, pagination));
+    }
+
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody AdminCreateUserRequest req) {
-        return ResponseEntity.ok(adminUserService.createUser(req));
+    public ResponseEntity<BaseResponse<User>> create(
+            @RequestBody @Valid CreateUserRequest req
+    ) {
+        User user = adminUserService.createUser(req);
+        return ResponseEntity.ok(BaseResponse.of(user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> get(@PathVariable Long id) {
-        return ResponseEntity.ok(adminUserService.getUser(id));
+    public ResponseEntity<BaseResponse<User>> get(@PathVariable Long id) {
+        User user = adminUserService.getUser(id);
+        return ResponseEntity.ok(BaseResponse.of(user));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody AdminUpdateUserRequest req) {
-        return ResponseEntity.ok(adminUserService.updateUser(id, req));
+    public ResponseEntity<BaseResponse<User>> update(@PathVariable Long id,
+                                                     @RequestBody UpdateUserRequest req) {
+        User user = adminUserService.updateUser(id, req);
+        return ResponseEntity.ok(BaseResponse.of(user));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         adminUserService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/password")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordRequest req) {
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordRequest req) {
         adminUserService.updatePassword(id, req.getNewPassword());
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/metadata")
+    public ResponseEntity<?> updateMetadata(
+            @PathVariable Long id,
+            @RequestBody UpdateMetadataRequest req
+    ) {
+        adminUserService.updateMetadata(id, req.getMetadata());
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/{id}/lock")
-    public ResponseEntity<Void> lock(@PathVariable Long id, @RequestBody LockAccountRequest req) {
+    public ResponseEntity<?> lock(@PathVariable Long id, @RequestBody LockAccountRequest req) {
         adminUserService.lockUser(id, req.isLocked(), req.getLockedUntil());
         return ResponseEntity.ok().build();
     }

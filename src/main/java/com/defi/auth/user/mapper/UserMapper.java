@@ -1,29 +1,31 @@
 package com.defi.auth.user.mapper;
 
-import com.defi.auth.user.dto.AdminCreateUserRequest;
-import com.defi.auth.user.dto.AdminUpdateUserRequest;
+import com.defi.auth.user.dto.CreateUserRequest;
+import com.defi.auth.user.dto.UpdateUserRequest;
+import com.defi.auth.user.dto.UserResponse;
 import com.defi.auth.user.entity.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-@Component
-public class UserMapper {
+import java.util.List;
 
-    public User toUser(AdminCreateUserRequest req) {
-        return User.builder()
-                .userName(req.getUserName())
-                .fullName(req.getFullName())
-                .email(req.getEmail())
-                .emailVerified(false)
-                .phone(null)
-                .phoneVerified(false)
-                .locked(false)
-                .lockedUntil(null)
-                .build();
-    }
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
+public interface UserMapper {
 
-    public void updateUser(User user, AdminUpdateUserRequest req) {
-        user.setFullName(req.getFullName());
-        user.setEmail(req.getEmail());
-        user.setPhone(req.getPhone());
-    }
+    @Mapping(target = "emailVerified", constant = "false")
+    @Mapping(target = "phoneVerified", constant = "false")
+    @Mapping(target = "locked", constant = "false")
+    @Mapping(target = "lockedUntil", ignore = true)
+    User toUser(CreateUserRequest req);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateUser(@MappingTarget User user, UpdateUserRequest req);
+
+    @Mapping(target = "roles", source = "roles")
+    @Mapping(target = "groups", source = "groups")
+    @Mapping(target = "accessToken", source = "accessToken")
+    @Mapping(target = "refreshToken", source = "refreshToken")
+    UserResponse toResponse(User user, List<Long> roles, List<Long> groups, String accessToken, String refreshToken);
 }
