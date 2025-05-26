@@ -19,4 +19,10 @@ public interface UserInGroupRepository extends JpaRepository<UserInGroup, UserIn
         WHERE ug.id.groupId = :groupId
     """)
     List<User> findUsersByGroupId(@Param("groupId") Long groupId, Pageable pageable);
+
+    @Query("""
+        SELECT ug.id.groupId FROM UserInGroup ug
+        WHERE ug.id.userId = :userId
+    """)
+    List<Long> findGroupIdsByUserId(@Param("userId") Long userId);
 }

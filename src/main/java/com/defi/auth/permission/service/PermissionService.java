@@ -1,17 +1,15 @@
 package com.defi.auth.permission.service;
 
-import com.defi.auth.permission.dto.PermissionDto;
 import com.defi.auth.permission.dto.PermissionRequest;
+import com.defi.auth.permission.entity.Permission;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PermissionService {
-    List<PermissionDto> findAll();
-    Optional<PermissionDto> findById(Long id);
-    PermissionDto create(PermissionRequest request);
+    List<Permission> findAll();
+    Permission findById(Long id);
+    Permission create(PermissionRequest request);
     void delete(Long id);
-    List<PermissionDto> findByRoleId(Long roleId);
-
-    List<PermissionDto> findByResourceId(Long resourceId);
+    List<Permission> findByRoleCode(Long roleId);
+    List<Permission> findByResourceCode(Long resourceId);
 }

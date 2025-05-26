@@ -24,12 +24,7 @@ public class CasbinConfig {
                 model.getFile().getAbsolutePath(),
                 policy.getFile().getAbsolutePath()
         );
-
-        enforcer.enableLog(true); // Bật log nội bộ của Casbin nếu cần
-
-        log.info("Casbin policy loaded: {}", enforcer.getPolicy());
-        log.info("Casbin groupings loaded: {}", enforcer.getGroupingPolicy());
-
+        enforcer.enableLog(true);
         return enforcer;
     }
 }

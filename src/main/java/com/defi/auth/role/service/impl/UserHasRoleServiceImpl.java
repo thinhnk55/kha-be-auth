@@ -2,8 +2,9 @@ package com.defi.auth.role.service.impl;
 
 import com.defi.auth.role.entity.UserHasRole;
 import com.defi.auth.role.entity.UserHasRoleId;
-import com.defi.auth.role.repository.UserRoleInGroupRepository;
+import com.defi.auth.role.repository.UserHasRoleRepository;
 import com.defi.auth.role.service.UserHasRoleService;
+import com.defi.auth.user.repository.UserEffectiveRoleViewRepository;
 import com.defi.common.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,39 +17,50 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserHasRoleServiceImpl implements UserHasRoleService {
 
-    private final UserRoleInGroupRepository userRoleInGroupRepository;
+    private final UserHasRoleRepository userHasRoleRepository;
+    private final UserEffectiveRoleViewRepository effectiveRoleViewRepository;
+
+    @Override
+    public List<Long> findRoleIdsByUserId(Long userId) {
+        return effectiveRoleViewRepository.findRoleIdsByUserId(userId);
+    }
 
     @Override
     public void assignRoleToUser(Long userId, Long roleId) {
         UserHasRoleId id = new UserHasRoleId(userId, roleId);
-        if (userRoleInGroupRepository.existsById(id)) {
+        if (userHasRoleRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
         }
         UserHasRole entity = UserHasRole.builder()
                 .id(id)
-                .assignedAt(System.currentTimeMillis())
                 .build();
-        userRoleInGroupRepository.save(entity);
+        userHasRoleRepository.save(entity);
     }
 
     @Override
     public void removeRoleFromUser(Long userId, Long roleId) {
         UserHasRoleId id = new UserHasRoleId(userId, roleId);
-        userRoleInGroupRepository.deleteById(id);
-    }
-
-    @Override
-    public List<UserHasRole> getUserHasRole(Long userId, Long groupId) {
-        return userRoleInGroupRepository.findAllByIdUserIdAndIdGroupId(userId, groupId);
+        userHasRoleRepository.deleteById(id);
     }
 
     @Override
     public List<UserHasRole> findAllByIdUserId(Long userId) {
-        return userRoleInGroupRepository.findAllByIdUserId(userId);
+        return userHasRoleRepository.findAllByIdUserId(userId);
     }
 
     @Override
     public List<UserHasRole> findAllByIdRoleId(Long roleId) {
-        return userRoleInGroupRepository.findAllByIdRoleId(roleId);
+        return userHasRoleRepository.findAllByIdRoleId(roleId);
+    }
+
+    @Override
+    public UserHasRole getUserHasRole(Long userId, Long roleId) {
+        UserHasRoleId id = UserHasRoleId.builder()
+                .roleId(roleId)
+                .userId(userId)
+                .build();
+        return userHasRoleRepository.findById(id).orElseThrow(
+                ()->new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND)
+        );
     }
 }

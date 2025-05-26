@@ -18,12 +18,12 @@ public class AdminUserHasRoleController {
     private final UserHasRoleService userHasRoleService;
 
     @GetMapping("/{userId}/{roleId}")
-    public ResponseEntity<BaseResponse<List<UserHasRole>>> getUserHasRole(
+    public ResponseEntity<BaseResponse<UserHasRole>> getUserHasRole(
             @PathVariable Long userId,
             @PathVariable Long roleId
     ) {
-        List<UserHasRole> list = userHasRoleService.getUserHasRole(userId, roleId);
-        return ResponseEntity.ok(BaseResponse.of(list));
+        UserHasRole userHasRole = userHasRoleService.getUserHasRole(userId, roleId);
+        return ResponseEntity.ok(BaseResponse.of(userHasRole));
     }
 
     @PostMapping

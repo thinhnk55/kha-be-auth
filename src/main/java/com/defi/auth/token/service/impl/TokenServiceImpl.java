@@ -109,10 +109,10 @@ public class TokenServiceImpl implements TokenService {
                     .build();
 
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .subject(payload.getSubjectId().toString())
+                    .subject(payload.getSubjectId())
                     .issueTime(new Date(payload.getIat() * 1000))
                     .expirationTime(new Date(payload.getExp() * 1000))
-                    .claim(ClaimField.ID.getName(), payload.getSessionId().toString())
+                    .claim(ClaimField.ID.getName(), payload.getSessionId())
                     .claim(ClaimField.TYPE.getName(), payload.getTokenType().getName())
                     .claim(ClaimField.SUBJECT_NAME.getName(), payload.getSubjectName())
                     .claim(ClaimField.SUBJECT_TYPE.getName(), payload.getSubjectName())
@@ -124,7 +124,7 @@ public class TokenServiceImpl implements TokenService {
             signedJWT.sign(signer);
             return signedJWT.serialize();
         } catch (JOSEException e) {
-            throw new RuntimeException("Token signing failed", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -190,7 +190,7 @@ public class TokenServiceImpl implements TokenService {
                     .exp(expiresAt)
                     .build();
         } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse token", e);
+            throw new RuntimeException(e);
         }
     }
 }

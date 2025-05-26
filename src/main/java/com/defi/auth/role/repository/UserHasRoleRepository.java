@@ -8,9 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserRoleInGroupRepository extends JpaRepository<UserHasRole, UserHasRoleId> {
+public interface UserHasRoleRepository extends JpaRepository<UserHasRole, UserHasRoleId> {
     List<UserHasRole> findAllByIdUserId(Long userId);
-    List<UserHasRole> findAllByIdGroupId(Long groupId);
     List<UserHasRole> findAllByIdRoleId(Long roleId);
-    List<UserHasRole> findAllByIdUserIdAndIdGroupId(Long userId, Long groupId);
 }

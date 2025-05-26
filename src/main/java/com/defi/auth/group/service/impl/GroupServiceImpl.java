@@ -1,55 +1,44 @@
 package com.defi.auth.group.service.impl;
 
 import com.defi.auth.group.dto.CreateGroupRequest;
-import com.defi.auth.group.dto.GroupDto;
 import com.defi.auth.group.dto.UpdateGroupMetadataRequest;
 import com.defi.auth.group.dto.UpdateGroupRequest;
 import com.defi.auth.group.entity.Group;
-import com.defi.auth.group.entity.UserInGroup;
-import com.defi.auth.group.entity.UserInGroupId;
 import com.defi.auth.group.mapper.GroupMapper;
 import com.defi.auth.group.repository.GroupRepository;
-import com.defi.auth.group.repository.UserInGroupRepository;
 import com.defi.auth.group.service.GroupService;
-import com.defi.auth.user.entity.User;
-import com.defi.auth.user.repository.UserRepository;
 import com.defi.common.CommonMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
-    private final UserRepository userRepository;
-    private final UserInGroupRepository userInGroupRepository;
-    private final GroupMapper groupMapper;
+
+    GroupMapper mapper;
 
     @Override
-    public GroupDto createGroup(CreateGroupRequest req) {
+    public Group createGroup(CreateGroupRequest req) {
         if (groupRepository.existsByParentIdAndCode(req.getParentId(), req.getCode())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
         }
-        Group group = groupMapper.fromCreateRequest(req);
+        Group group = mapper.fromCreateRequest(req);
         groupRepository.save(group);
-
-        return groupMapper.toDTO(group);
+        return group;
     }
 
-
     @Override
-    public GroupDto updateGroup(Long id, UpdateGroupRequest req) {
+    public Group updateGroup(Long id, UpdateGroupRequest req) {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
         group.setName(req.getName());
         groupRepository.save(group);
-        return groupMapper.toDTO(group);
+        return group;
     }
 
     @Override
@@ -66,46 +55,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupDto getGroup(Long id) {
-        Group group = groupRepository.findById(id)
+    public Group getGroup(Long id) {
+        return groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
-        return groupMapper.toDTO(group);
     }
 
     @Override
-    public List<GroupDto> findAll() {
-        List<Group> groups = groupRepository.findAll();
-        return groups.stream().map(groupMapper::toDTO).toList();
-    }
-
-    @Override
-    public List<User> getUsersByGroup(Long groupId, Pageable pageable) {
-        return userInGroupRepository.findUsersByGroupId(groupId, pageable);
-    }
-    @Override
-    public void addUserToGroup(Long userId, Long groupId) {
-        if (!userRepository.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND);
-        }
-
-        if (!groupRepository.existsById(groupId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND);
-        }
-
-        UserInGroupId id = new UserInGroupId(userId, groupId);
-        if (userInGroupRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
-        }
-        userInGroupRepository.save(new UserInGroup(id));
-    }
-
-    @Override
-    public void removeUserFromGroup(Long userId, Long groupId) {
-        UserInGroupId id = new UserInGroupId(userId, groupId);
-        if (!userInGroupRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND);
-        }
-        userInGroupRepository.deleteById(id);
+    public List<Group> findAll() {
+        return groupRepository.findAll();
     }
 }
+
 

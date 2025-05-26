@@ -23,7 +23,7 @@ public class Token {
     private String sessionId;
 
     /**
-     * ID of the subject the token represents (e.g., user UUID).
+     * ID of the subject the token represents (e.g., UUID).
      */
     private String subjectId;
 

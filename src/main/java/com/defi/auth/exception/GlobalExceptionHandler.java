@@ -17,7 +17,6 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<BaseResponse<?>> handleResponseStatusException(ResponseStatusException ex) {
         BaseResponse<?> response = BaseResponse.of(ex.getStatusCode().value(),

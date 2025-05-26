@@ -36,6 +36,9 @@ public record BaseResponse <T>(
     public static BaseResponse<?> of(int code, String message){
         return BaseResponse.of(code, message, null, null, null);
     }
+    public static <T> BaseResponse< T> of(int code, String message, T data){
+        return BaseResponse.of(code, message, data, null, null);
+    }
 
     public static BaseResponse<?> of(Exception e) {
         if(e instanceof ResponseStatusException ex){

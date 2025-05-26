@@ -7,8 +7,10 @@ import lombok.Data;
 public class PermissionRequest {
     @NotNull
     private Long roleId;
+
     @NotNull
     private Long resourceId;
+
     @NotNull
     private Long actionId;
 }

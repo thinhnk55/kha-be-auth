@@ -1,7 +1,7 @@
 package com.defi.auth.permission.controler;
 
-import com.defi.auth.permission.dto.PermissionDto;
 import com.defi.auth.permission.dto.PermissionRequest;
+import com.defi.auth.permission.entity.Permission;
 import com.defi.auth.permission.service.PermissionService;
 import com.defi.common.BaseResponse;
 import jakarta.validation.Valid;
@@ -19,36 +19,36 @@ public class PermissionController {
     private final PermissionService permissionService;
 
     @GetMapping
-    public ResponseEntity<BaseResponse<List<PermissionDto>>> getAll() {
+    public ResponseEntity<BaseResponse<List<Permission>>> getAll() {
         return ResponseEntity.ok(BaseResponse.of(permissionService.findAll()));
     }
 
 
     @GetMapping("/by-role/{roleId}")
-    public ResponseEntity<BaseResponse<List<PermissionDto>>> findByRoleId(
+    public ResponseEntity<BaseResponse<List<Permission>>> findByRoleId(
             @PathVariable Long roleId
     ) {
-        List<PermissionDto> result = permissionService.findByRoleId(roleId);
+        List<Permission> result = permissionService.findByRoleCode(roleId);
         return ResponseEntity.ok(BaseResponse.of(result));
     }
 
     @GetMapping("/by-resource/{resourceId}")
-    public ResponseEntity<BaseResponse<List<PermissionDto>>> findByResourceId(
+    public ResponseEntity<BaseResponse<List<Permission>>> findByResourceCode(
             @PathVariable Long resourceId
     ) {
-        List<PermissionDto> result = permissionService.findByResourceId(resourceId);
+        List<Permission> result = permissionService.findByResourceCode(resourceId);
         return ResponseEntity.ok(BaseResponse.of(result));
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse<PermissionDto>> create(@RequestBody @Valid PermissionRequest request) {
-        PermissionDto permission = permissionService.create(request);
+    public ResponseEntity<BaseResponse<Permission>> create(@RequestBody @Valid PermissionRequest request) {
+        Permission permission = permissionService.create(request);
         return ResponseEntity.ok(BaseResponse.of(permission));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<?>> delete(@PathVariable Long id) {
         permissionService.delete(id);
-        return ResponseEntity.ok(BaseResponse.of("deleted"));
+        return ResponseEntity.ok().build();
     }
 }
