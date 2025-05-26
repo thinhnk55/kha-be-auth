@@ -21,7 +21,7 @@ steps:
       APP_KEY: kha-auth
     commands:
       - echo "Start building ...."
-      - gradle build extractDependencies -x test --info
+      - gradle build extractDependencies -x test -x bootJar --info
       - echo "Finish building. Start copy files..."
       - mkdir -p build/app/libs build/app/logs build/app/config
       - cp -r config/* build/app/config/
