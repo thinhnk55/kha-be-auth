@@ -20,18 +20,14 @@ steps:
       APP_NAME: kha-auth-1.0.0.jar
       APP_KEY: kha-auth
     commands:
-      - echo "Start building ...."
       - gradle build extractDependencies -x test -x bootJar --info
-      - echo "Finish building. Start copy files..."
-      - mkdir -p build/app/libs build/app/logs build/app/config
-      - cp -r config/* build/app/config/
+      - mkdir -p build/app/libs build/app/logs
       - cp build/libs/$APP_NAME build/app/
       - cp -r build/dependencies/* build/app/libs/
       - mkdir -p /mount/java/$APP_KEY/app/logs
       - chmod -R 777 /mount/java/$APP_KEY/app/logs
       - cp -r build/app/* /mount/java/$APP_KEY/app/
       - cp docker-compose.yaml /mount/java/$APP_KEY/
-      - echo "Finish copy files."
     when:
       event:
         - push
