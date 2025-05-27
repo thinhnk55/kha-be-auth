@@ -18,13 +18,16 @@ public class SecurityConfig {
 
     private final JwtTokenFilter jwtTokenFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtConfig jwtConfig;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        String[] publicPaths = jwtConfig.getPublicPaths().stream()
+                        .map(s -> s + "/**").toArray(String[]::new);
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/v1/public/**").permitAll()
+                        .requestMatchers(publicPaths).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
