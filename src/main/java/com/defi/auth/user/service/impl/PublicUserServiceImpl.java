@@ -1,12 +1,9 @@
 package com.defi.auth.user.service.impl;
 
-import com.defi.common.config.JwtConfig;
 import com.defi.auth.group.service.UserInGroupService;
 import com.defi.auth.role.service.UserHasRoleService;
 import com.defi.auth.session.entity.Session;
 import com.defi.auth.session.service.SessionService;
-import com.defi.auth.token.entity.TokenType;
-import com.defi.auth.token.service.TokenService;
 import com.defi.auth.user.dto.CreateUserRequest;
 import com.defi.auth.user.dto.LockedUserDto;
 import com.defi.auth.user.dto.LoginUserRequest;
@@ -23,6 +20,9 @@ import com.defi.auth.user.service.LoginFailureService;
 import com.defi.auth.user.service.PublicUserService;
 import com.defi.common.api.BaseResponse;
 import com.defi.common.api.CommonMessage;
+import com.defi.common.config.JwtConfig;
+import com.defi.common.token.entity.TokenType;
+import com.defi.common.token.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
