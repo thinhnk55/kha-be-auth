@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("SELECT u FROM User u")
+    @Query("SELECT u FROM User u ORDER BY u.id DESC")
     List<User> listUsers(Pageable pageable);
 
     boolean existsByEmail(String email);
