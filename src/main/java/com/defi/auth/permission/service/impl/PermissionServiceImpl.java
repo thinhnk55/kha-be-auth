@@ -5,7 +5,7 @@ import com.defi.auth.permission.entity.Permission;
 import com.defi.auth.permission.mapper.PermissionMapper;
 import com.defi.auth.permission.repository.PermissionRepository;
 import com.defi.auth.permission.service.PermissionService;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

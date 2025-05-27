@@ -9,7 +9,7 @@ import com.defi.auth.permission.repository.ResourceRepository;
 import com.defi.auth.permission.repository.ResourceHasActionRepository;
 import com.defi.auth.permission.mapper.ResourceMapper;
 import com.defi.auth.permission.service.ResourceService;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -9,7 +9,7 @@ import com.defi.auth.user.mapper.UserMapper;
 import com.defi.auth.user.repository.UserCredentialRepository;
 import com.defi.auth.user.repository.UserRepository;
 import com.defi.auth.user.service.AdminUserService;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

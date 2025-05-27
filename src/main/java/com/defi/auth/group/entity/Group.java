@@ -1,6 +1,6 @@
 package com.defi.auth.group.entity;
 
-import com.defi.common.BaseModel;
+import com.defi.common.model.BaseModel;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;

@@ -5,7 +5,7 @@ import com.defi.auth.role.entity.UserHasRoleId;
 import com.defi.auth.role.repository.UserHasRoleRepository;
 import com.defi.auth.role.service.UserHasRoleService;
 import com.defi.auth.user.repository.UserEffectiveRoleViewRepository;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.defi.auth.permission.entity;
 
-import com.defi.common.BaseModel;
+import com.defi.common.model.BaseModel;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;

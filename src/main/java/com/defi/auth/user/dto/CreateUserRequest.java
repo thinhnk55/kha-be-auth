@@ -1,6 +1,6 @@
 package com.defi.auth.user.dto;
 
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
