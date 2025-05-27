@@ -3,7 +3,7 @@ package com.defi.auth.role.controller;
 import com.defi.auth.role.dto.UserHasRoleDto;
 import com.defi.auth.role.entity.UserHasRole;
 import com.defi.auth.role.service.UserHasRoleService;
-import com.defi.common.BaseResponse;
+import com.defi.common.api.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -3,7 +3,7 @@ package com.defi.auth.role.service.impl;
 import com.defi.auth.role.entity.Role;
 import com.defi.auth.role.repository.RoleRepository;
 import com.defi.auth.role.service.RoleService;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

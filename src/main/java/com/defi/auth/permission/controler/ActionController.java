@@ -3,7 +3,7 @@ package com.defi.auth.permission.controler;
 import com.defi.auth.permission.dto.ActionRequest;
 import com.defi.auth.permission.entity.Action;
 import com.defi.auth.permission.service.ActionService;
-import com.defi.common.BaseResponse;
+import com.defi.common.api.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

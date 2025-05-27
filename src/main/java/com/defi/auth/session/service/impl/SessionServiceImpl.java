@@ -4,7 +4,7 @@ import com.defi.auth.config.SessionConfig;
 import com.defi.auth.session.entity.Session;
 import com.defi.auth.session.repository.SessionRepository;
 import com.defi.auth.session.service.SessionService;
-import com.defi.auth.token.entity.Token;
+import com.defi.common.token.entity.Token;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

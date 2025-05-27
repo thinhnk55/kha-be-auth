@@ -21,6 +21,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -52,7 +53,11 @@ dependencies {
 	implementation("org.bouncycastle:bcprov-jdk18on:1.80")
 	implementation("org.bouncycastle:bcpkix-jdk18on:1.80")
 	implementation("org.casbin:jcasbin:1.81.0")
-	// unit test
+
+	dependencies {
+		implementation("com.github.thinhnk55:kha-be-common:1.0.0")
+	}
+
 	testImplementation("org.mockito:mockito-core:5.12.0")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
 }

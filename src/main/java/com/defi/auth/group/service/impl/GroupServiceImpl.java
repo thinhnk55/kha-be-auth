@@ -7,7 +7,7 @@ import com.defi.auth.group.entity.Group;
 import com.defi.auth.group.mapper.GroupMapper;
 import com.defi.auth.group.repository.GroupRepository;
 import com.defi.auth.group.service.GroupService;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
