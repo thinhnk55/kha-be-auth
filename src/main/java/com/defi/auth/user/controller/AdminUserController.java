@@ -1,6 +1,5 @@
 package com.defi.auth.user.controller;
 
-import com.defi.auth.casbin.CasbinAuthorize;
 import com.defi.auth.user.dto.*;
 import com.defi.auth.user.entity.User;
 import com.defi.auth.user.service.AdminUserService;
@@ -23,7 +22,6 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     @GetMapping
-    @CasbinAuthorize(resource = "users", action = "read")
     public ResponseEntity<BaseResponse<List<User>>> listUsers(
             @PageableDefault Pageable pageable
     ) {

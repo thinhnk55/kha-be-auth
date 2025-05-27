@@ -35,7 +35,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public List<User> listUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).getContent();
+        return userRepository.listUsers(pageable);
     }
 
     @Override
