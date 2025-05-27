@@ -1,4 +1,4 @@
-package com.defi.auth.web;
+package com.defi.common.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;

@@ -1,4 +1,4 @@
-package com.defi.auth.config;
+package com.defi.common.config;
 
 import com.defi.auth.token.helper.RSAKeyUtil;
 import com.nimbusds.jose.crypto.RSASSASigner;

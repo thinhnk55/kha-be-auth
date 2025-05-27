@@ -1,4 +1,4 @@
-package com.defi.common;
+package com.defi.common.api;
 
 import org.springframework.data.domain.Pageable;
 

@@ -5,7 +5,7 @@ import com.defi.auth.permission.entity.Action;
 import com.defi.auth.permission.repository.ActionRepository;
 import com.defi.auth.permission.mapper.ActionMapper;
 import com.defi.auth.permission.service.ActionService;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

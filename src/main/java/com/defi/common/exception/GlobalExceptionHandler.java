@@ -1,7 +1,7 @@
-package com.defi.auth.exception;
+package com.defi.common.exception;
 
-import com.defi.common.BaseResponse;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.BaseResponse;
+import com.defi.common.api.CommonMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

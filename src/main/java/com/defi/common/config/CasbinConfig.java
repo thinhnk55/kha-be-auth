@@ -1,4 +1,4 @@
-package com.defi.auth.config;
+package com.defi.common.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.defi.common;
+package com.defi.common.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,12 +13,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class StringBaseModel {
+public abstract class BaseModel {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(updatable = false)
     private Long createdAt;
+
     private Long updatedAt;
 
     @PrePersist

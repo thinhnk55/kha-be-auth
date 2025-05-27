@@ -1,6 +1,6 @@
 package com.defi.auth.group.dto;
 
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

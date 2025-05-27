@@ -1,4 +1,4 @@
-package com.defi.auth.config;
+package com.defi.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

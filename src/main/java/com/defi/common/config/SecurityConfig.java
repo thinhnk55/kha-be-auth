@@ -1,7 +1,7 @@
-package com.defi.auth.config;
+package com.defi.common.config;
 
-import com.defi.auth.filter.JwtAuthenticationEntryPoint;
-import com.defi.auth.filter.JwtTokenFilter;
+import com.defi.common.filter.JwtAuthenticationEntryPoint;
+import com.defi.common.filter.JwtTokenFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

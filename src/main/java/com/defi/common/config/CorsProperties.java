@@ -1,4 +1,4 @@
-package com.defi.auth.config;
+package com.defi.common.config;
 
 import lombok.Getter;
 import lombok.Setter;

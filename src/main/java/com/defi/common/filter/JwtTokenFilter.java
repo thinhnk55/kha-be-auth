@@ -1,11 +1,11 @@
-package com.defi.auth.filter;
+package com.defi.common.filter;
 
-import com.defi.auth.config.JwtConfig;
+import com.defi.common.config.JwtConfig;
 import com.defi.auth.token.entity.Token;
 import com.defi.auth.token.entity.TokenType;
 import com.defi.auth.token.service.TokenService;
-import com.defi.common.BaseResponse;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.BaseResponse;
+import com.defi.common.api.CommonMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

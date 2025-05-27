@@ -1,7 +1,7 @@
 package com.defi.auth.user.controller;
 
-import com.defi.auth.filter.CustomUserPrincipal;
-import com.defi.common.BaseResponse;
+import com.defi.common.filter.CustomUserPrincipal;
+import com.defi.common.api.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

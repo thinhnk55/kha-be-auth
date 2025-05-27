@@ -1,4 +1,4 @@
-package com.defi.auth.filter;
+package com.defi.common.filter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

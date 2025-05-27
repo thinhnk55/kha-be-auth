@@ -1,4 +1,4 @@
-package com.defi.auth.casbin;
+package com.defi.common.casbin;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

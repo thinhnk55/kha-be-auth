@@ -7,7 +7,7 @@ import com.defi.auth.group.service.UserInGroupService;
 import com.defi.auth.group.repository.GroupRepository;
 import com.defi.auth.user.repository.UserRepository;
 import com.defi.auth.user.entity.User;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

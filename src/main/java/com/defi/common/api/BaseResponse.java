@@ -1,4 +1,4 @@
-package com.defi.common;
+package com.defi.common.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;

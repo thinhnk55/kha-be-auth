@@ -1,4 +1,4 @@
-package com.defi.common;
+package com.defi.common.api;
 
 public final class CommonMessage {
     public static final String INVALID = "invalid";

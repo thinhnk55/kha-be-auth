@@ -1,8 +1,8 @@
-package com.defi.auth.web;
+package com.defi.common.web;
 
 import java.lang.annotation.*;
 
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface IpAddress {}
+public @interface UserAgent {}

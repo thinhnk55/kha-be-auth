@@ -1,6 +1,6 @@
-package com.defi.auth.casbin;
+package com.defi.common.casbin;
 
-import com.defi.common.CommonMessage;
+import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

@@ -1,7 +1,7 @@
-package com.defi.auth.filter;
+package com.defi.common.filter;
 
-import com.defi.common.BaseResponse;
-import com.defi.common.CommonMessage;
+import com.defi.common.api.BaseResponse;
+import com.defi.common.api.CommonMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

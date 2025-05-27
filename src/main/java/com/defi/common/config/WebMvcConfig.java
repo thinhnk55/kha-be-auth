@@ -1,7 +1,7 @@
-package com.defi.auth.config;
+package com.defi.common.config;
 
-import com.defi.auth.web.IpAddressArgumentResolver;
-import com.defi.auth.web.UserAgentArgumentResolver;
+import com.defi.common.web.IpAddressArgumentResolver;
+import com.defi.common.web.UserAgentArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
