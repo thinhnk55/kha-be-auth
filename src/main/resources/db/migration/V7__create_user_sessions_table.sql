@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE INDEX IF NOT EXISTS idx__sessions__user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx__sessions_ip_address ON sessions(ip_address);
 CREATE INDEX IF NOT EXISTS idx__sessions__expired_time ON sessions(expired_time);
-
 -- Composite indexes for common queries
 CREATE INDEX IF NOT EXISTS idx__sessions_user_id__expired_time ON sessions(user_id, expired_time);
 CREATE INDEX IF NOT EXISTS idx__sessions__expired_time__not_before ON sessions(expired_time, not_before);
