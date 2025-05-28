@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class LockAccountRequest {
-    private boolean isLocked;
+    private boolean locked;
     private Long lockedUntil;
 }

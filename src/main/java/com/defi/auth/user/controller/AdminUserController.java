@@ -56,7 +56,8 @@ public class AdminUserController {
     }
 
     @PutMapping("/{id}/password")
-    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordRequest req) {
+    public ResponseEntity<?> updatePassword(@PathVariable Long id,
+                                            @RequestBody UpdatePasswordRequest req) {
         adminUserService.updatePassword(id, req.getNewPassword());
         return ResponseEntity.ok().build();
     }
@@ -70,7 +71,8 @@ public class AdminUserController {
     }
 
     @PutMapping("/{id}/lock")
-    public ResponseEntity<?> lock(@PathVariable Long id, @RequestBody LockAccountRequest req) {
+    public ResponseEntity<?> lock(@PathVariable Long id,
+                                  @RequestBody LockAccountRequest req) {
         adminUserService.lockUser(id, req.isLocked(), req.getLockedUntil());
         return ResponseEntity.ok().build();
     }
