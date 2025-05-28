@@ -18,20 +18,17 @@ CREATE TABLE users (
     metadata JSONB
 );
 
--- GIN index hỗ trợ tìm kiếm ILIKE cho full_name
-CREATE INDEX idx_trgm__users__full_name
+CREATE INDEX idx_trgm__users__user_name
 ON users
-USING gin (full_name gin_trgm_ops);
--- GIN index hỗ trợ tìm kiếm ILIKE cho email
+USING gin (user_name public.gin_trgm_ops);
+
 CREATE INDEX IF NOT EXISTS idx_trgm__users__email
 ON users
-USING gin (email gin_trgm_ops);
+USING gin (email public.gin_trgm_ops);
 
--- GIN index hỗ trợ tìm kiếm ILIKE cho phone
 CREATE INDEX IF NOT EXISTS idx_trgm__users__phone
 ON users
-USING gin (phone gin_trgm_ops);
-
+USING gin (phone public.gin_trgm_ops);
 
 
 CREATE TABLE user_credentials (
@@ -47,6 +44,7 @@ CREATE TABLE user_credentials (
 
     PRIMARY KEY (user_id, type)
 );
+
 
 
 
