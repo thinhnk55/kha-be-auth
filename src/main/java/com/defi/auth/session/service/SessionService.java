@@ -5,4 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface SessionService {
     Session createSession(Long userId, String ip, String userAgent, ObjectNode metadata);
+
+    void deleteSession(Long sessionId);
 }
