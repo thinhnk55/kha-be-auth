@@ -121,7 +121,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void verifyEmail(Long userId, String value) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, CommonMessage.NOT_FOUND));
-        user.setEmailVerified(true);
+        user.setEmailVerified(Boolean.parseBoolean(value));
         userRepository.save(user);
     }
 
@@ -129,7 +129,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void verifyPhone(Long userId, String value) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, CommonMessage.NOT_FOUND));
-        user.setPhoneVerified(true);
+        user.setEmailVerified(Boolean.parseBoolean(value));
         userRepository.save(user);
     }
 }
