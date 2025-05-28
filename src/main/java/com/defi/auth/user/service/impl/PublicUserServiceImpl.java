@@ -22,7 +22,7 @@ import com.defi.common.api.BaseResponse;
 import com.defi.common.api.CommonMessage;
 import com.defi.common.config.JwtConfig;
 import com.defi.common.token.entity.TokenType;
-import com.defi.common.token.service.TokenService;
+import com.defi.common.token.service.TokenIssuerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +41,7 @@ public class PublicUserServiceImpl implements PublicUserService {
     private final UserCredentialRepository userCredentialRepository;
     private final UserRepository userRepository;
     private final AdminUserService adminUserService;
-    private final TokenService tokenService;
+    private final TokenIssuerService tokenIssuerService;
     private final SessionService sessionService;
     private final UserHasRoleService userHasRoleService;
     private final UserInGroupService userInGroupService;
@@ -63,7 +63,7 @@ public class PublicUserServiceImpl implements PublicUserService {
 
         List<String> empty = new LinkedList<>();
 
-        String accessToken = tokenService.generateToken(
+        String accessToken = tokenIssuerService.generateToken(
                 String.valueOf(session.getId()),
                 TokenType.ACCESS_TOKEN,
                 String.valueOf(user.getId()),
@@ -72,7 +72,7 @@ public class PublicUserServiceImpl implements PublicUserService {
                 empty,
                 jwtConfig.getAccessTokenTimeToLive().toSeconds()
         );
-        String refreshToken = tokenService.generateToken(
+        String refreshToken = tokenIssuerService.generateToken(
                 String.valueOf(session.getId()),
                 TokenType.REFRESH_TOKEN,
                 String.valueOf(user.getId()),
@@ -133,7 +133,7 @@ public class PublicUserServiceImpl implements PublicUserService {
         List<Long> groups = userInGroupService.findGroupIdsByUserId(user.getId());
 
         // 7. Sinh token
-        String accessToken = tokenService.generateToken(
+        String accessToken = tokenIssuerService.generateToken(
                 String.valueOf(session.getId()),
                 TokenType.ACCESS_TOKEN,
                 String.valueOf(user.getId()),
@@ -142,7 +142,7 @@ public class PublicUserServiceImpl implements PublicUserService {
                 groups.stream().map(String::valueOf).toList(),
                 jwtConfig.getAccessTokenTimeToLive().toSeconds()
         );
-        String refreshToken = tokenService.generateToken(
+        String refreshToken = tokenIssuerService.generateToken(
                 String.valueOf(session.getId()),
                 TokenType.REFRESH_TOKEN,
                 String.valueOf(user.getId()),

@@ -22,10 +22,10 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public Session createSession(Long userId, String ip, String userAgent, ObjectNode metadata) {
         boolean check = checkCreationLimits(userId, ip);
-        if(!check){
+        if (!check) {
             return null;
         }
-        final long now = System.currentTimeMillis()/1000;
+        final long now = System.currentTimeMillis() / 1000;
         Session session = Session.builder()
                 .id(null)
                 .userId(userId)
@@ -45,13 +45,13 @@ public class SessionServiceImpl implements SessionService {
         if (config.isUserLimitActive()) {
             int userSessionCount = repository.countByUserId(userId);
             if (userSessionCount >= config.getUserSessionLimit()) {
-                return  false;
+                return false;
             }
         }
         if (config.isIpLimitActive()) {
             int ipSessionCount = repository.countByIpAddress(ip);
             if (ipSessionCount >= config.getIpSessionLimit()) {
-                return  false;
+                return false;
             }
         }
         return true;
@@ -79,5 +79,10 @@ public class SessionServiceImpl implements SessionService {
         session.setNotBefore(now);
 
         return repository.save(session);
+    }
+
+    @Override
+    public void deleteSession(Long sessionId) {
+        repository.deleteById(sessionId);
     }
 }
