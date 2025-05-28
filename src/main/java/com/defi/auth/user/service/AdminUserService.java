@@ -10,12 +10,22 @@ import java.util.List;
 
 public interface AdminUserService {
     List<User> listUsers(Pageable pageable);
-    User createUser(CreateUserRequest request);
-    User getUser(Long id);
-    User updateUser(Long id, UpdateUserRequest request);
-    void deleteUser(Long id);
-    void updatePassword(Long userId, String newPassword);
-    void updateMetadata(Long id, ObjectNode metadata);
-    void lockUser(Long userId, boolean isLocked, long lockedUntil);
-}
 
+    User createUser(CreateUserRequest request);
+
+    User getUser(Long id);
+
+    User updateUser(Long id, UpdateUserRequest request);
+
+    void deleteUser(Long id);
+
+    void updatePassword(Long userId, String newPassword);
+
+    void updateMetadata(Long id, ObjectNode metadata);
+
+    void lockUser(Long userId, boolean isLocked, long lockedUntil);
+
+    void verifyEmail(Long userId, String value);
+
+    void verifyPhone(Long userId, String value);
+}

@@ -23,8 +23,7 @@ public class AdminUserController {
 
     @GetMapping
     public ResponseEntity<BaseResponse<List<User>>> listUsers(
-            @PageableDefault Pageable pageable
-    ) {
+            @PageableDefault Pageable pageable) {
         List<User> users = adminUserService.listUsers(pageable);
         Pagination pagination = Pagination.of(pageable);
         return ResponseEntity.ok(BaseResponse.of(users, pagination));
@@ -32,8 +31,7 @@ public class AdminUserController {
 
     @PostMapping
     public ResponseEntity<BaseResponse<User>> create(
-            @RequestBody @Valid CreateUserRequest req
-    ) {
+            @RequestBody @Valid CreateUserRequest req) {
         User user = adminUserService.createUser(req);
         return ResponseEntity.ok(BaseResponse.of(user));
     }
@@ -46,7 +44,7 @@ public class AdminUserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse<User>> update(@PathVariable Long id,
-                                                     @RequestBody UpdateUserRequest req) {
+            @RequestBody UpdateUserRequest req) {
         User user = adminUserService.updateUser(id, req);
         return ResponseEntity.ok(BaseResponse.of(user));
     }
@@ -66,8 +64,7 @@ public class AdminUserController {
     @PutMapping("/{id}/metadata")
     public ResponseEntity<?> updateMetadata(
             @PathVariable Long id,
-            @RequestBody UpdateMetadataRequest req
-    ) {
+            @RequestBody UpdateMetadataRequest req) {
         adminUserService.updateMetadata(id, req.getMetadata());
         return ResponseEntity.ok().build();
     }
@@ -75,6 +72,18 @@ public class AdminUserController {
     @PutMapping("/{id}/lock")
     public ResponseEntity<?> lock(@PathVariable Long id, @RequestBody LockAccountRequest req) {
         adminUserService.lockUser(id, req.isLocked(), req.getLockedUntil());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/verify-email/{value}")
+    public ResponseEntity<?> verifyEmail(@PathVariable Long id, @PathVariable String value) {
+        adminUserService.verifyEmail(id, value);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/verify-phone/{value}")
+    public ResponseEntity<?> verifyPhone(@PathVariable Long id, @PathVariable String value) {
+        adminUserService.verifyPhone(id, value);
         return ResponseEntity.ok().build();
     }
 }

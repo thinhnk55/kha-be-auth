@@ -42,8 +42,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByUserName(request.getUserName())
-        || userRepository.existsByEmail(request.getEmail())
-        || userRepository.existsByPhone(request.getPhone())) {
+                || userRepository.existsByEmail(request.getEmail())
+                || userRepository.existsByPhone(request.getPhone())) {
             throw new ResponseStatusException(CONFLICT, CommonMessage.EXISTING);
         }
 
@@ -64,13 +64,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         return user;
     }
 
-
     @Override
     public User getUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        NOT_FOUND
-                ));
+                        NOT_FOUND));
     }
 
     @Override
@@ -84,8 +82,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResponseStatusException(
-                    NOT_FOUND
-            );
+                    NOT_FOUND);
         }
         userRepository.deleteById(id);
     }
@@ -117,6 +114,22 @@ public class AdminUserServiceImpl implements AdminUserService {
             user.setLocked(false);
             user.setLockedUntil(null);
         }
+        userRepository.save(user);
+    }
+
+    @Override
+    public void verifyEmail(Long userId, String value) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, CommonMessage.NOT_FOUND));
+        user.setEmailVerified(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void verifyPhone(Long userId, String value) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, CommonMessage.NOT_FOUND));
+        user.setPhoneVerified(true);
         userRepository.save(user);
     }
 }
