@@ -20,13 +20,14 @@ steps:
       APP_NAME: kha-auth-1.0.0.jar
       APP_KEY: kha-auth
     commands:
+      - apt-get update && apt-get install -y rsync
       - gradle build extractDependencies -x test -x bootJar --info
       - mkdir -p build/app/libs build/app/logs
       - cp build/libs/$APP_NAME build/app/
       - cp -r build/dependencies/* build/app/libs/
       - mkdir -p /mount/java/$APP_KEY/app/logs
       - chmod -R 777 /mount/java/$APP_KEY/app/logs
-      - cp -r build/app/* /mount/java/$APP_KEY/app/
+      - rsync -av --delete build/app/ /mount/java/$APP_KEY/app/
       - cp docker-compose.yaml /mount/java/$APP_KEY/
     when:
       event:
@@ -34,6 +35,7 @@ steps:
         - pull_request
       branch:
         - main
+
 
   deploy:
     image: docker:26.1-cli
@@ -44,7 +46,6 @@ steps:
       APP_KEY: kha-auth
     commands:
       - echo "🚀 Deploying $APP_KEY..."
-
       - docker compose -f /mount/java/$APP_KEY/docker-compose.yaml down
       - docker compose -f /mount/java/$APP_KEY/docker-compose.yaml up -d
     when:
