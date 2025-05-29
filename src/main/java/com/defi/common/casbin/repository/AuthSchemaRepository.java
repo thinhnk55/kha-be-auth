@@ -1,10 +1,12 @@
 package com.defi.common.casbin.repository;
 
-import com.defi.common.casbin.model.PolicyRule;
+import com.defi.common.casbin.entity.PolicyRule;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -12,9 +14,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Repository for querying auth schema from other services.
- * Handles cross-schema queries to load permissions data using policy_rules
- * view.
+ * Repository for querying policy rules from the database.
+ * 
+ * <p>This repository provides access to the {@code policy_rules} view, which combines
+ * data from permissions, resources, and actions tables to provide a simplified interface
+ * for loading Casbin policies.</p>
+ * 
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Unified access to policy data through database view</li>
+ *   <li>Resource-based filtering for microservice architectures</li>
+ *   <li>Optimized batch loading of policies</li>
+ *   <li>Connection health checking</li>
+ * </ul>
+ * 
+ * @author Defi Team
+ * @since 1.0.0
  */
 @Repository
 @RequiredArgsConstructor
@@ -24,11 +39,19 @@ public class AuthSchemaRepository {
     private final JdbcTemplate jdbcTemplate;
 
     /**
-     * RowMapper for PolicyRule to avoid deprecated query methods
+     * RowMapper for converting database rows to PolicyRule objects.
+     * 
+     * <p>Maps the following database columns:</p>
+     * <ul>
+     *   <li>{@code id} → {@link PolicyRule#getId()}</li>
+     *   <li>{@code role_id} → {@link PolicyRule#getRoleId()}</li>
+     *   <li>{@code resource_code} → {@link PolicyRule#getResourceCode()}</li>
+     *   <li>{@code action_code} → {@link PolicyRule#getActionCode()}</li>
+     * </ul>
      */
     private static final RowMapper<PolicyRule> POLICY_RULE_ROW_MAPPER = new RowMapper<PolicyRule>() {
         @Override
-        public PolicyRule mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public PolicyRule mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
             return PolicyRule.builder()
                     .id(rs.getLong("id"))
                     .roleId(rs.getLong("role_id"))
@@ -39,9 +62,14 @@ public class AuthSchemaRepository {
     };
 
     /**
-     * Find permissions by resource codes with cross-schema query using policy_rules
-     * view.
-     * This is the main method used by services to load their relevant policies.
+     * Finds permissions by resource codes with optimized batch query.
+     * 
+     * <p>This method is used for resource-based filtering in microservice architectures
+     * where each service only needs policies for specific resources it manages.</p>
+     * 
+     * @param resourceCodes list of resource codes to filter by
+     * @return list of policy rules matching the specified resources, ordered by ID
+     * @throws RuntimeException if the database query fails
      */
     public List<PolicyRule> findPermissionsByResourceCodes(List<String> resourceCodes) {
         if (resourceCodes == null || resourceCodes.isEmpty()) {
@@ -52,13 +80,12 @@ public class AuthSchemaRepository {
         log.debug("Loading permissions for resources: {}", resourceCodes);
 
         try {
-            // Create placeholders for IN clause
             String placeholders = String.join(",", resourceCodes.stream()
                     .map(r -> "?").toList());
 
             String sql = """
                     SELECT id, role_id, resource_code, action_code
-                    FROM auth.policy_rules
+                    FROM policy_rules
                     WHERE resource_code IN (%s)
                     ORDER BY id
                     """.formatted(placeholders);
@@ -70,169 +97,55 @@ public class AuthSchemaRepository {
 
         } catch (Exception e) {
             log.error("Failed to load permissions for resources: {}", resourceCodes, e);
-            throw new RuntimeException("Cross-schema permission query failed", e);
+            throw new RuntimeException("Permission query failed", e);
         }
     }
 
     /**
-     * Find all permissions from auth schema (fallback method).
-     * Used when Redis is down and full reload is needed.
+     * Finds all permissions in the system.
+     * 
+     * <p>This method loads all available policy rules without any filtering.
+     * Use with caution in large systems as it may return a significant amount of data.</p>
+     * 
+     * @return list of all policy rules, ordered by ID
+     * @throws RuntimeException if the database query fails
      */
     public List<PolicyRule> findAllPermissions() {
-        log.info("Loading all permissions from auth schema (fallback mode)");
+        log.info("Loading all permissions");
 
         try {
             String sql = """
                     SELECT id, role_id, resource_code, action_code
-                    FROM auth.policy_rules
+                    FROM policy_rules
                     ORDER BY id
                     """;
 
             List<PolicyRule> policies = jdbcTemplate.query(sql, POLICY_RULE_ROW_MAPPER);
 
-            log.info("Loaded {} total policies from auth schema", policies.size());
+            log.info("Loaded {} total policies", policies.size());
             return policies;
 
         } catch (Exception e) {
-            log.error("Failed to load all permissions from auth schema", e);
+            log.error("Failed to load all permissions", e);
             throw new RuntimeException("Full permission query failed", e);
         }
     }
 
     /**
-     * Find permissions by resource codes for current schema (auth service only).
-     * This method is used when running within auth service (no cross-schema
-     * needed).
+     * Checks database connectivity by executing a simple test query.
+     * 
+     * <p>This method verifies that the {@code policy_rules} view is accessible
+     * and the database connection is working properly.</p>
+     * 
+     * @return true if database is accessible and policy_rules view exists, false otherwise
      */
-    public List<PolicyRule> findPermissionsByResourceCodesLocal(List<String> resourceCodes) {
-        if (resourceCodes == null || resourceCodes.isEmpty()) {
-            log.warn("No resource codes provided, returning empty list");
-            return List.of();
-        }
-
-        log.debug("Loading permissions for resources (local): {}", resourceCodes);
-
-        try {
-            // Create placeholders for IN clause
-            String placeholders = String.join(",", resourceCodes.stream()
-                    .map(r -> "?").toList());
-
-            String sql = """
-                    SELECT id, role_id, resource_code, action_code
-                    FROM policy_rules
-                    WHERE resource_code IN (%s)
-                    ORDER BY id
-                    """.formatted(placeholders);
-
-            List<PolicyRule> policies = jdbcTemplate.query(sql, POLICY_RULE_ROW_MAPPER, resourceCodes.toArray());
-
-            log.info("Loaded {} policies for resources (local): {}", policies.size(), resourceCodes);
-            return policies;
-
-        } catch (Exception e) {
-            log.error("Failed to load permissions for resources (local): {}", resourceCodes, e);
-            throw new RuntimeException("Local permission query failed", e);
-        }
-    }
-
-    /**
-     * Find all permissions for current schema (auth service only).
-     */
-    public List<PolicyRule> findAllPermissionsLocal() {
-        log.info("Loading all permissions from local schema");
-
-        try {
-            String sql = """
-                    SELECT id, role_id, resource_code, action_code
-                    FROM policy_rules
-                    ORDER BY id
-                    """;
-
-            List<PolicyRule> policies = jdbcTemplate.query(sql, POLICY_RULE_ROW_MAPPER);
-
-            log.info("Loaded {} total policies from local schema", policies.size());
-            return policies;
-
-        } catch (Exception e) {
-            log.error("Failed to load all permissions from local schema", e);
-            throw new RuntimeException("Local full permission query failed", e);
-        }
-    }
-
-    /**
-     * Check database connectivity to auth schema
-     */
-    public boolean isAuthSchemaAccessible() {
-        try {
-            Integer result = jdbcTemplate.queryForObject("SELECT 1 FROM auth.policy_rules LIMIT 1", Integer.class);
-            return result != null && result == 1;
-        } catch (Exception e) {
-            log.warn("Auth schema is not accessible: {}", e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Check local schema connectivity (for auth service)
-     */
-    public boolean isLocalSchemaAccessible() {
+    public boolean isDatabaseAccessible() {
         try {
             Integer result = jdbcTemplate.queryForObject("SELECT 1 FROM policy_rules LIMIT 1", Integer.class);
             return result != null && result == 1;
         } catch (Exception e) {
-            log.warn("Local schema is not accessible: {}", e.getMessage());
+            log.warn("Database is not accessible: {}", e.getMessage());
             return false;
-        }
-    }
-
-    /**
-     * Get total permission count for monitoring (auth schema)
-     */
-    public long getTotalPermissionCount() {
-        try {
-            Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM auth.policy_rules", Long.class);
-            return count != null ? count : 0;
-        } catch (Exception e) {
-            log.error("Failed to get permission count", e);
-            return -1;
-        }
-    }
-
-    /**
-     * Get total permission count for monitoring (local schema)
-     */
-    public long getTotalPermissionCountLocal() {
-        try {
-            Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM policy_rules", Long.class);
-            return count != null ? count : 0;
-        } catch (Exception e) {
-            log.error("Failed to get local permission count", e);
-            return -1;
-        }
-    }
-
-    /**
-     * Get permissions count by resource codes for monitoring
-     */
-    public long getPermissionCountByResources(List<String> resourceCodes) {
-        if (resourceCodes == null || resourceCodes.isEmpty()) {
-            return 0;
-        }
-
-        try {
-            String placeholders = String.join(",", resourceCodes.stream()
-                    .map(r -> "?").toList());
-
-            String sql = """
-                    SELECT COUNT(*) FROM auth.policy_rules
-                    WHERE resource_code IN (%s)
-                    """.formatted(placeholders);
-
-            Long count = jdbcTemplate.queryForObject(sql, Long.class, resourceCodes.toArray());
-            return count != null ? count : 0;
-        } catch (Exception e) {
-            log.error("Failed to get permission count for resources: {}", resourceCodes, e);
-            return -1;
         }
     }
 }

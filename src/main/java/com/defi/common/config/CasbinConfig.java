@@ -1,82 +1,88 @@
 package com.defi.common.config;
 
 import com.defi.common.casbin.config.CasbinProperties;
+import com.defi.common.casbin.event.PolicyEventConstant;
 import com.defi.common.casbin.event.PolicyEventListener;
 import com.defi.common.casbin.service.PolicyLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.model.Model;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Casbin configuration for simplified architecture.
- * Loads policies from database only, with event-driven updates.
+ * Configuration class for Casbin authorization framework.
+ * 
+ * <p>This configuration sets up the Casbin enforcer with RBAC (Role-Based Access Control) model
+ * and provides Redis-based policy change notifications for distributed systems.</p>
+ * 
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Synchronous policy loading during application startup</li>
+ *   <li>Redis message listener for real-time policy updates</li>
+ *   <li>Fail-fast initialization to ensure policies are ready before API access</li>
+ * </ul>
+ * 
+ * @author Defi Team
+ * @since 1.0.0
  */
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@EnableAsync
-@EnableScheduling
 public class CasbinConfig {
 
     private final CasbinProperties casbinProperties;
     private final PolicyLoader policyLoader;
 
     /**
-     * Create Casbin Enforcer bean
+     * Creates and configures the Casbin Enforcer bean with policies loaded synchronously.
+     * 
+     * <p>This method ensures that all policies are loaded from the database before the
+     * application becomes available to handle requests. If policy loading fails, the
+     * application startup will fail.</p>
+     * 
+     * @return configured Casbin enforcer with policies loaded
+     * @throws RuntimeException if enforcer creation or policy loading fails
      */
     @Bean
     public Enforcer enforcer() {
         try {
+            log.info("Creating Casbin enforcer");
+
             // Load model from classpath
-            ClassPathResource modelResource = new ClassPathResource("casbin/rbac_model.conf");
+            ClassPathResource modelResource = new ClassPathResource("casbin/model.conf");
             Model model = Enforcer.newModel(modelResource.getPath());
 
-            // Create enforcer without initial policies
+            // Create enforcer
             Enforcer enforcer = new Enforcer(model);
 
-            log.info("Casbin enforcer created successfully for service: {}",
-                    casbinProperties.getServiceName());
+            // Load policies synchronously during bean creation
+            log.info("Loading initial policies synchronously...");
+            policyLoader.loadPolicies(enforcer);
 
+            log.info("Casbin enforcer created and policies loaded successfully");
             return enforcer;
 
         } catch (Exception e) {
-            log.error("Failed to create Casbin enforcer", e);
-            throw new RuntimeException("Casbin enforcer creation failed", e);
+            log.error("Failed to create Casbin enforcer or load policies", e);
+            throw new RuntimeException("Casbin initialization failed", e);
         }
     }
 
     /**
-     * Load initial policies after application startup
-     */
-    @EventListener(ApplicationReadyEvent.class)
-    public void loadInitialPolicies() {
-        try {
-            log.info("Loading initial policies for service: {}", casbinProperties.getServiceName());
-
-            Enforcer enforcer = enforcer();
-            policyLoader.loadPolicies(enforcer);
-
-            log.info("Initial policy loading completed successfully");
-
-        } catch (Exception e) {
-            log.error("Failed to load initial policies", e);
-            throw new RuntimeException("Initial policy loading failed", e);
-        }
-    }
-
-    /**
-     * Redis message listener container for policy change events
+     * Creates Redis message listener container for policy change events.
+     * 
+     * <p>This container listens for policy change notifications on the configured Redis channel
+     * and triggers automatic policy reloading across all service instances.</p>
+     * 
+     * @param connectionFactory Redis connection factory for establishing connections
+     * @param policyEventListener listener that handles policy change events
+     * @return configured Redis message listener container
      */
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
@@ -87,10 +93,11 @@ public class CasbinConfig {
         container.setConnectionFactory(connectionFactory);
 
         // Subscribe to policy change events
-        String channel = casbinProperties.getRedisChannel();
-        container.addMessageListener(policyEventListener, new ChannelTopic(channel));
+        container.addMessageListener(policyEventListener, new ChannelTopic(
+            PolicyEventConstant.DEFAULT_CHANNEL));
 
-        log.info("Redis message listener configured for channel: {}", channel);
+        log.info("Redis message listener configured for channel: {}",
+         PolicyEventConstant.DEFAULT_CHANNEL);
         return container;
     }
 }

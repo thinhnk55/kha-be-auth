@@ -1,4 +1,4 @@
-package com.defi.auth.permission.controler;
+package com.defi.auth.permission.controller;
 
 import com.defi.auth.permission.dto.ActionRequest;
 import com.defi.auth.permission.entity.Action;

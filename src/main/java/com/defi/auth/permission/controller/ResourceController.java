@@ -1,4 +1,4 @@
-package com.defi.auth.permission.controler;
+package com.defi.auth.permission.controller;
 
 import com.defi.auth.permission.dto.ResourceDto;
 import com.defi.auth.permission.dto.ResourceRequest;

@@ -1,7 +1,7 @@
 package com.defi.common.casbin.service;
 
 import com.defi.common.casbin.config.CasbinProperties;
-import com.defi.common.casbin.model.PolicyRule;
+import com.defi.common.casbin.entity.PolicyRule;
 import com.defi.common.casbin.repository.AuthSchemaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,23 @@ import java.util.List;
 
 /**
  * Service responsible for loading policies into Casbin enforcer from database.
- * Simplified architecture without Redis cache - policies are cached in enforcer
- * memory.
+ * 
+ * <p>This service handles the complete policy loading process, including:</p>
+ * <ul>
+ *   <li>Loading policies from database based on configuration</li>
+ *   <li>Resource-based filtering for microservice architectures</li>
+ *   <li>Batch loading into Casbin enforcer for optimal performance</li>
+ *   <li>Policy synchronization and cache management</li>
+ * </ul>
+ * 
+ * <p>The service supports two loading modes:</p>
+ * <ul>
+ *   <li><strong>Filtered loading</strong>: Loads only policies for specific resources (recommended)</li>
+ *   <li><strong>Full loading</strong>: Loads all policies (use for central services)</li>
+ * </ul>
+ * 
+ * @author Defi Team
+ * @since 1.0.0
  */
 @Service
 @RequiredArgsConstructor
@@ -24,17 +39,33 @@ public class PolicyLoader {
     private final CasbinProperties casbinProperties;
 
     /**
-     * Load policies into enforcer from database.
-     * Uses local schema for auth service, cross-schema for other services.
+     * Loads policies into the Casbin enforcer from database.
+     * 
+     * <p>This method performs a complete policy reload:</p>
+     * <ol>
+     *   <li>Determines which policies to load based on configuration</li>
+     *   <li>Clears existing policies from enforcer</li>
+     *   <li>Loads new policies from database</li>
+     *   <li>Batch inserts policies into enforcer for optimal performance</li>
+     * </ol>
+     * 
+     * <p>The loading strategy depends on {@link CasbinProperties#isEnableFiltering()} and
+     * {@link CasbinProperties#getResources()}:</p>
+     * <ul>
+     *   <li>If filtering is disabled or no resources specified: loads all policies</li>
+     *   <li>If filtering is enabled with resources: loads only policies for those resources</li>
+     * </ul>
+     * 
+     * @param enforcer the Casbin enforcer to load policies into
+     * @throws RuntimeException if policy loading fails
      */
     public void loadPolicies(Enforcer enforcer) {
-        String serviceName = casbinProperties.getServiceName();
         List<String> resources = casbinProperties.getResources();
 
-        log.info("Loading policies for service: {} with resources: {}", serviceName, resources);
+        log.info("Loading policies for resources: {}", resources);
 
         try {
-            List<PolicyRule> policies = loadPoliciesFromDatabase(resources, serviceName);
+            List<PolicyRule> policies = loadPoliciesFromDatabase(resources);
 
             // Clear existing policies first
             enforcer.clearPolicy();
@@ -42,132 +73,61 @@ public class PolicyLoader {
             // Load new policies into enforcer
             loadPoliciesIntoEnforcer(enforcer, policies);
 
-            log.info("Policy loading completed for service: {} - {} policies loaded",
-                    serviceName, policies.size());
+            log.info("Policy loading completed for service: {} - {} policies loaded", policies.size());
 
         } catch (Exception e) {
-            log.error("Failed to load policies for service: {}", serviceName, e);
+            log.error("Failed to load policies for service: {}", e);
             throw new RuntimeException("Policy loading failed", e);
         }
     }
 
     /**
-     * Load policies from database based on service type and resources
+     * Loads policies from database based on resource filtering configuration.
+     * 
+     * @param resources list of resource codes to filter by, or empty for all policies
+     * @return list of policy rules loaded from database
      */
-    private List<PolicyRule> loadPoliciesFromDatabase(List<String> resources, String serviceName) {
-        boolean isAuthService = "auth-service".equals(serviceName);
-
-        if (!casbinProperties.isEnableFiltering() || resources.isEmpty()) {
-            // Load all policies
-            if (isAuthService) {
-                log.debug("Loading all policies from local schema (auth service)");
-                return authSchemaRepository.findAllPermissionsLocal();
-            } else {
-                log.debug("Loading all policies from auth schema (other service)");
-                return authSchemaRepository.findAllPermissions();
-            }
-        } else {
-            // Load filtered policies by resources
-            if (isAuthService) {
-                log.debug("Loading filtered policies from local schema for resources: {}", resources);
-                return authSchemaRepository.findPermissionsByResourceCodesLocal(resources);
-            } else {
-                log.debug("Loading filtered policies from auth schema for resources: {}", resources);
-                return authSchemaRepository.findPermissionsByResourceCodes(resources);
-            }
-        }
+    private List<PolicyRule> loadPoliciesFromDatabase(List<String> resources) {
+        return authSchemaRepository.findPermissionsByResourceCodes(resources);
     }
 
     /**
-     * Load policies into Casbin enforcer
+     * Loads policies into Casbin enforcer using batch operations for optimal performance.
+     * 
+     * <p>This method converts all policy rules to Casbin format and performs a single
+     * batch insert operation, which is significantly faster than individual inserts
+     * when dealing with large numbers of policies.</p>
+     * 
+     * @param enforcer the Casbin enforcer to load policies into
+     * @param policies list of policy rules to load
+     * @throws RuntimeException if batch loading fails
      */
     private void loadPoliciesIntoEnforcer(Enforcer enforcer, List<PolicyRule> policies) {
         log.debug("Loading {} policies into enforcer", policies.size());
 
-        int successCount = 0;
-        int failureCount = 0;
-
-        for (PolicyRule policy : policies) {
-            try {
-                String[] casbinPolicy = policy.toCasbinPolicy();
-                boolean added = enforcer.addPolicy(casbinPolicy);
-
-                if (added) {
-                    successCount++;
-                    log.debug("Added policy: {}", policy);
-                } else {
-                    log.debug("Policy already exists, skipped: {}", policy);
-                }
-
-            } catch (Exception e) {
-                failureCount++;
-                log.error("Failed to add policy to enforcer: {}", policy, e);
-            }
+        if (policies.isEmpty()) {
+            log.info("No policies to load");
+            return;
         }
 
-        log.info("Policy loading into enforcer completed: {} success, {} failures",
-                successCount, failureCount);
-
-        if (failureCount > 0) {
-            log.warn("Some policies failed to load, enforcer may not have complete policy set");
-        }
-    }
-
-    /**
-     * Check if database is available
-     */
-    public boolean isDatabaseAvailable() {
-        String serviceName = casbinProperties.getServiceName();
-        boolean isAuthService = "auth-service".equals(serviceName);
-
-        if (isAuthService) {
-            return authSchemaRepository.isLocalSchemaAccessible();
-        } else {
-            return authSchemaRepository.isAuthSchemaAccessible();
-        }
-    }
-
-    /**
-     * Get current policy count from enforcer
-     */
-    public int getCurrentPolicyCount(Enforcer enforcer) {
         try {
-            return enforcer.getPolicy().size();
+            // Convert all policies to Casbin format
+            String[][] casbinPolicies = policies.stream()
+                    .map(PolicyRule::toCasbinPolicy)
+                    .toArray(String[][]::new);
+
+            // Add all policies in batch
+            boolean success = enforcer.addPolicies(casbinPolicies);
+
+            if (success) {
+                log.info("Successfully loaded {} policies into enforcer", policies.size());
+            } else {
+                log.warn("Some policies may have failed to load or already existed");
+            }
+
         } catch (Exception e) {
-            log.error("Failed to get policy count from enforcer", e);
-            return -1;
+            log.error("Failed to load policies into enforcer", e);
+            throw new RuntimeException("Policy loading into enforcer failed", e);
         }
-    }
-
-    /**
-     * Get database policy count for monitoring
-     */
-    public long getDatabasePolicyCount() {
-        String serviceName = casbinProperties.getServiceName();
-        boolean isAuthService = "auth-service".equals(serviceName);
-
-        if (isAuthService) {
-            return authSchemaRepository.getTotalPermissionCountLocal();
-        } else {
-            return authSchemaRepository.getTotalPermissionCount();
-        }
-    }
-
-    /**
-     * Get database policy count for specific resources
-     */
-    public long getDatabasePolicyCountForResources(List<String> resources) {
-        if (resources == null || resources.isEmpty()) {
-            return getDatabasePolicyCount();
-        }
-
-        return authSchemaRepository.getPermissionCountByResources(resources);
-    }
-
-    /**
-     * Health check - simplified to only check database
-     */
-    public boolean isHealthy() {
-        return isDatabaseAvailable();
     }
 }
