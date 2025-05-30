@@ -64,6 +64,16 @@ public class AdminGroupController {
         return ResponseEntity.ok().build();
     }
 
+
+    @DeleteMapping("/{groupId}/users/{userId}")
+    public ResponseEntity<BaseResponse<List<User>>> removeUserFromGroup(
+            @PathVariable Long groupId,
+            @PathVariable Long userId
+    ) {
+        userInGroupService.removeUserFromGroup(userId, groupId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{groupId}/users")
     public ResponseEntity<BaseResponse<List<User>>> getUsersByGroup(
             @PathVariable Long groupId,
@@ -74,12 +84,12 @@ public class AdminGroupController {
         return ResponseEntity.ok(BaseResponse.of(users, pagination));
     }
 
-    @PostMapping("/{groupId}/users/{userId}")
-    public ResponseEntity<BaseResponse<List<User>>> addUserToGroup(
+    @PostMapping("/{groupId}/users")
+    public ResponseEntity<BaseResponse<List<User>>> addUsersToGroup(
             @PathVariable Long groupId,
-            @PathVariable Long userId
+            @RequestBody List<Long> userIds
     ) {
-        userInGroupService.addUserToGroup(userId, groupId);
+        userInGroupService.addUsersToGroup(userIds, groupId);
         return ResponseEntity.ok().build();
     }
 }

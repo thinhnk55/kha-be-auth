@@ -14,11 +14,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> listUsers(Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE " +
-            "(:keyword IS NULL OR :keyword = '' OR " +
             "LOWER(u.userName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(u.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "ORDER BY u.id DESC")
     List<User> searchUsers(@Param("keyword") String keyword, Pageable pageable);
 

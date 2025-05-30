@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserInGroupService {
     List<User> findUsersByGroupId(Long groupId, Pageable pageable);
 
-    void addUserToGroup(Long userId, Long groupId);
+    void addUsersToGroup(List<Long> userId, Long groupId);
 
     void removeUserFromGroup(Long userId, Long groupId);
 

@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -157,7 +158,15 @@ public class PublicUserServiceImpl implements PublicUserService {
 
     @Override
     public List<User> searchUsers(String keyword, Pageable pageable) {
-        return userRepository.searchUsers(keyword, pageable);
+        // Trim whitespace và check null/empty
+        String trimmedKeyword = keyword != null ? keyword.trim() : null;
+
+        // Nếu keyword null, empty hoặc chỉ toàn whitespace -> return empty list
+        if (trimmedKeyword == null || trimmedKeyword.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return userRepository.searchUsers(trimmedKeyword, pageable);
     }
 
     private void handleLoginFailure(User user) {
