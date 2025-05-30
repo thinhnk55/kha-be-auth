@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for loading policies from database using custom SQL queries.
@@ -123,5 +124,37 @@ public class DatabasePolicyLoader {
             log.warn("Database query validation failed for: {}", sqlQuery, e);
             return false;
         }
+    }
+
+    /**
+     * Gets the current version for a specific component code from database.
+     * 
+     * <p>
+     * This method provides direct database access to version information,
+     * which is faster than API calls for services with database connectivity.
+     * </p>
+     * 
+     * @param code the component code (e.g., "policy_version")
+     * @return current version number, or empty if not found
+     */
+    public Optional<Long> getCurrentVersion(String code) {
+        try {
+            String sql = "SELECT version FROM auth_version WHERE code = ?";
+            Long version = jdbcTemplate.queryForObject(sql, Long.class, code);
+            log.debug("Retrieved version {} for code: {} from database", version, code);
+            return Optional.ofNullable(version);
+        } catch (Exception e) {
+            log.debug("Failed to get version for code: {} from database", code, e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets the current policy version specifically.
+     * 
+     * @return current policy version, or 0 if not found
+     */
+    public long getCurrentPolicyVersion() {
+        return getCurrentVersion("policy_version").orElse(0L);
     }
 }

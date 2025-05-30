@@ -7,11 +7,13 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ResourceMapper {
 
     ResourceDto toDto(Resource resource, List<Long> actions);
+
     Resource toEntity(ResourceRequest request);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget Resource entity, ResourceRequest request);
 }

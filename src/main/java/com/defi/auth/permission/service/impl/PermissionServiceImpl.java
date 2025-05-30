@@ -1,5 +1,6 @@
 package com.defi.auth.permission.service.impl;
 
+import com.defi.auth.internal.service.VersionService;
 import com.defi.auth.permission.dto.UpdateRolePermissionsRequest;
 import com.defi.auth.permission.entity.Permission;
 import com.defi.auth.permission.repository.PermissionRepository;
@@ -23,6 +24,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     private final PermissionRepository permissionRepository;
     private final PolicyEventPublisher policyEventPublisher;
+    private final VersionService versionService;
 
     @Override
     public List<Permission> findAll() {
@@ -69,6 +71,10 @@ public class PermissionServiceImpl implements PermissionService {
         permissionRepository.saveAll(newPermissions);
         log.info("Created {} new permissions for role: {}",
                 newPermissions.size(), request.getRoleId());
+
+        // Increment policy version to notify other services
+        long newVersion = versionService.incrementPolicyVersion();
+        log.info("Incremented policy version to: {} after permission update", newVersion);
 
         // Publish event to reload policies
         policyEventPublisher.publishReloadEvent();

@@ -8,10 +8,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
-)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
     @Mapping(target = "emailVerified", constant = "false")

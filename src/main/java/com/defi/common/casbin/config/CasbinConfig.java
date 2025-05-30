@@ -17,6 +17,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Configuration class for Casbin authorization framework.
@@ -43,6 +44,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
+@EnableScheduling
 public class CasbinConfig {
 
     private final ResourceLoader resourceLoader;
