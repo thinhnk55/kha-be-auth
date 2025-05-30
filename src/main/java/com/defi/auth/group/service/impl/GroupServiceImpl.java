@@ -37,6 +37,8 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
         group.setName(req.getName());
+        group.setCode(req.getCode());
+        group.setParentId(req.getParentId());
         groupRepository.save(group);
         return group;
     }

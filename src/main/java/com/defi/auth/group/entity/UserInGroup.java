@@ -13,5 +13,9 @@ import lombok.*;
 public class UserInGroup {
     @EmbeddedId
     private UserInGroupId id;
+
+    public UserInGroup(Long userId, Long groupId) {
+        this.id = new UserInGroupId(userId, groupId);
+    }
 }
 
