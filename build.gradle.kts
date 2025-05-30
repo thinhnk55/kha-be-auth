@@ -54,6 +54,8 @@ dependencies {
 	implementation("org.bouncycastle:bcpkix-jdk18on:1.80")
 	implementation("org.casbin:jcasbin:1.81.0")
 
+	implementation("com.github.thinhnk55:kha-be-common:1.0.5")
+
 	testImplementation("org.mockito:mockito-core:5.12.0")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
 }
