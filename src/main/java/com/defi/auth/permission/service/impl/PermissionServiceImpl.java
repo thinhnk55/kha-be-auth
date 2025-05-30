@@ -77,7 +77,7 @@ public class PermissionServiceImpl implements PermissionService {
         log.info("Incremented policy version to: {} after permission update", newVersion);
 
         // Publish event to reload policies
-        policyEventPublisher.publishReloadEvent();
+        policyEventPublisher.publishReloadPolicyEvent(newVersion);
 
         return newPermissions.size();
     }
