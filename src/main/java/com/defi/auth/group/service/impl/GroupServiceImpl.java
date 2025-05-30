@@ -20,7 +20,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
 
-    GroupMapper mapper;
+    private final GroupMapper mapper;
 
     @Override
     public Group createGroup(CreateGroupRequest req) {

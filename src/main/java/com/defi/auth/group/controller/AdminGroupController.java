@@ -27,7 +27,7 @@ public class AdminGroupController {
     private final UserInGroupService userInGroupService;
 
     @GetMapping()
-    public ResponseEntity<BaseResponse<List<Group>>> findAll(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse<List<Group>>> findAll() {
         List<Group> list = groupService.findAll();
         return ResponseEntity.ok(BaseResponse.of(list));
     }
@@ -72,5 +72,13 @@ public class AdminGroupController {
         List<User> users = userInGroupService.findUsersByGroupId(groupId, pageable);
         Pagination pagination = Pagination.of(pageable);
         return ResponseEntity.ok(BaseResponse.of(users, pagination));
+    }
+    @PutMapping("/{groupId}/users/{userId}")
+    public ResponseEntity<BaseResponse<List<User>>> addUserToGroup(
+            @PathVariable Long groupId,
+            @PathVariable Long userId
+    ) {
+        userInGroupService.addUserToGroup(userId, groupId);
+        return ResponseEntity.ok().build();
     }
 }
