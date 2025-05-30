@@ -2,7 +2,7 @@ package com.defi.common.casbin.service;
 
 import com.defi.common.casbin.config.CasbinProperties;
 import com.defi.common.casbin.entity.PolicyRule;
-import com.defi.common.casbin.repository.AuthSchemaRepository;
+import com.defi.common.casbin.util.PolicySourceParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.casbin.jcasbin.main.Enforcer;
@@ -11,20 +11,29 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service responsible for loading policies into Casbin enforcer from database.
+ * Service responsible for loading policies into Casbin enforcer from multiple
+ * sources.
  * 
- * <p>This service handles the complete policy loading process, including:</p>
+ * <p>
+ * This service orchestrates the complete policy loading process by:
+ * </p>
  * <ul>
- *   <li>Loading policies from database based on configuration</li>
- *   <li>Resource-based filtering for microservice architectures</li>
- *   <li>Batch loading into Casbin enforcer for optimal performance</li>
- *   <li>Policy synchronization and cache management</li>
+ * <li>Parsing and validating policy source configuration</li>
+ * <li>Delegating to appropriate source-specific loaders</li>
+ * <li>Applying resource filtering for microservice architectures</li>
+ * <li>Batch loading into Casbin enforcer for optimal performance</li>
  * </ul>
  * 
- * <p>The service supports two loading modes:</p>
+ * <p>
+ * Supported policy sources:
+ * </p>
  * <ul>
- *   <li><strong>Filtered loading</strong>: Loads only policies for specific resources (recommended)</li>
- *   <li><strong>Full loading</strong>: Loads all policies (use for central services)</li>
+ * <li><strong>Database</strong>: Custom SQL queries via
+ * {@link DatabasePolicyLoader}</li>
+ * <li><strong>Resource files</strong>: CSV files from classpath via
+ * {@link ResourcePolicyLoader}</li>
+ * <li><strong>API endpoints</strong>: REST APIs returning JSON via
+ * {@link ApiPolicyLoader}</li>
  * </ul>
  * 
  * @author Defi Team
@@ -35,37 +44,40 @@ import java.util.List;
 @Slf4j
 public class PolicyLoader {
 
-    private final AuthSchemaRepository authSchemaRepository;
     private final CasbinProperties casbinProperties;
+    private final DatabasePolicyLoader databasePolicyLoader;
+    private final ResourcePolicyLoader resourcePolicyLoader;
+    private final ApiPolicyLoader apiPolicyLoader;
 
     /**
-     * Loads policies into the Casbin enforcer from database.
+     * Loads policies into the Casbin enforcer from configured source.
      * 
-     * <p>This method performs a complete policy reload:</p>
+     * <p>
+     * This method performs a complete policy reload:
+     * </p>
      * <ol>
-     *   <li>Determines which policies to load based on configuration</li>
-     *   <li>Clears existing policies from enforcer</li>
-     *   <li>Loads new policies from database</li>
-     *   <li>Batch inserts policies into enforcer for optimal performance</li>
+     * <li>Parses and validates the policy source configuration</li>
+     * <li>Delegates to appropriate source-specific loader</li>
+     * <li>Applies resource filtering if configured</li>
+     * <li>Clears existing policies from enforcer</li>
+     * <li>Batch loads new policies into enforcer for optimal performance</li>
      * </ol>
-     * 
-     * <p>The loading strategy depends on {@link CasbinProperties#isEnableFiltering()} and
-     * {@link CasbinProperties#getResources()}:</p>
-     * <ul>
-     *   <li>If filtering is disabled or no resources specified: loads all policies</li>
-     *   <li>If filtering is enabled with resources: loads only policies for those resources</li>
-     * </ul>
      * 
      * @param enforcer the Casbin enforcer to load policies into
      * @throws RuntimeException if policy loading fails
      */
     public void loadPolicies(Enforcer enforcer) {
+        String policySource = casbinProperties.getPolicySource();
         List<String> resources = casbinProperties.getResources();
 
-        log.info("Loading policies for resources: {}", resources);
+        log.info("Starting policy loading with source: {} and resources: {}", policySource, resources);
 
         try {
-            List<PolicyRule> policies = loadPoliciesFromDatabase(resources);
+            // Parse and validate policy source configuration
+            PolicySourceParser.PolicySourceConfig config = PolicySourceParser.parse(policySource);
+
+            // Load policies from the specified source
+            List<PolicyRule> policies = loadPolicyRules(config.getType(), config.getQuery(), resources);
 
             // Clear existing policies first
             enforcer.clearPolicy();
@@ -73,30 +85,24 @@ public class PolicyLoader {
             // Load new policies into enforcer
             loadPoliciesIntoEnforcer(enforcer, policies);
 
-            log.info("Policy loading completed for service: {} - {} policies loaded", policies.size());
+            log.info("Policy loading completed successfully - {} policies loaded from source: {}",
+                    policies.size(), config.getType());
 
         } catch (Exception e) {
-            log.error("Failed to load policies for service: {}", e);
-            throw new RuntimeException("Policy loading failed", e);
+            log.error("Failed to load policies from source: {}", policySource, e);
+            throw new RuntimeException("Policy loading failed: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Loads policies from database based on resource filtering configuration.
+     * Loads policies into Casbin enforcer using batch operations for optimal
+     * performance.
      * 
-     * @param resources list of resource codes to filter by, or empty for all policies
-     * @return list of policy rules loaded from database
-     */
-    private List<PolicyRule> loadPoliciesFromDatabase(List<String> resources) {
-        return authSchemaRepository.findPermissionsByResourceCodes(resources);
-    }
-
-    /**
-     * Loads policies into Casbin enforcer using batch operations for optimal performance.
-     * 
-     * <p>This method converts all policy rules to Casbin format and performs a single
+     * <p>
+     * This method converts all policy rules to Casbin format and performs a single
      * batch insert operation, which is significantly faster than individual inserts
-     * when dealing with large numbers of policies.</p>
+     * when dealing with large numbers of policies.
+     * </p>
      * 
      * @param enforcer the Casbin enforcer to load policies into
      * @param policies list of policy rules to load
@@ -128,6 +134,30 @@ public class PolicyLoader {
         } catch (Exception e) {
             log.error("Failed to load policies into enforcer", e);
             throw new RuntimeException("Policy loading into enforcer failed", e);
+        }
+    }
+
+    /**
+     * Routes policy loading to the appropriate source-specific loader.
+     * 
+     * @param policyType  the type of policy source (database, resource, api)
+     * @param policyQuery the query/path/url for the policy source
+     * @param resources   list of resource codes to filter by
+     * @return list of loaded policy rules
+     * @throws RuntimeException if policy type is unsupported
+     */
+    private List<PolicyRule> loadPolicyRules(String policyType, String policyQuery, List<String> resources) {
+        log.debug("Loading policy rules - Type: {}, Query: {}, Resources: {}", policyType, policyQuery, resources);
+
+        switch (policyType) {
+            case "database":
+                return databasePolicyLoader.loadPolicyRulesFromDatabase(policyQuery, resources);
+            case "resource":
+                return resourcePolicyLoader.loadPolicyRulesFromCsv(policyQuery, resources);
+            case "api":
+                return apiPolicyLoader.loadPolicyRulesFromApi(policyQuery, resources);
+            default:
+                throw new RuntimeException("Unsupported policy type: " + policyType);
         }
     }
 }

@@ -9,12 +9,22 @@ import java.util.List;
 /**
  * Configuration properties for Casbin authorization framework.
  * 
- * <p>This class holds essential configuration settings for Casbin policy management,
- * including service identification, resource filtering, and Redis communication settings.</p>
+ * <p>
+ * This class holds essential configuration settings for Casbin policy
+ * management,
+ * including service identification, resource filtering, and Redis communication
+ * settings.
+ * </p>
  * 
- * <p>Configuration properties are bound from application properties with prefix {@code app.casbin}.</p>
+ * <p>
+ * Configuration properties are bound from application properties with prefix
+ * {@code app.casbin}.
+ * </p>
  * 
- * <p>Example configuration:</p>
+ * <p>
+ * Example configuration:
+ * </p>
+ * 
  * <pre>
  * app.casbin.service-name=auth-service
  * app.casbin.resources=users,roles,permissions
@@ -37,4 +47,5 @@ public class CasbinProperties {
      * @default empty list (loads all policies)
      */
     private List<String> resources = List.of();
+    private String policySource;
 }

@@ -13,30 +13,42 @@ import org.springframework.stereotype.Component;
 /**
  * Redis message listener for policy reload events in distributed systems.
  * 
- * <p>This component implements the Spring Data Redis {@link MessageListener} interface
- * to receive policy change notifications via Redis pub/sub mechanism. When a policy
- * reload message is received, it triggers an immediate policy refresh from the database.</p>
+ * <p>
+ * This component implements the Spring Data Redis {@link MessageListener}
+ * interface
+ * to receive policy change notifications via Redis pub/sub mechanism. When a
+ * policy
+ * reload message is received, it triggers an immediate policy refresh from the
+ * database.
+ * </p>
  * 
- * <p>Key features:</p>
+ * <p>
+ * Key features:
+ * </p>
  * <ul>
- *   <li>Listens for standardized {@link PolicyEventConstant#RELOAD_MESSAGE} events</li>
- *   <li>Automatically triggers policy reload via {@link PolicyLoader}</li>
- *   <li>Fail-safe operation - errors are logged but don't crash the service</li>
- *   <li>Supports distributed policy synchronization across service instances</li>
+ * <li>Listens for standardized {@link PolicyEventConstant#RELOAD_MESSAGE}
+ * events</li>
+ * <li>Automatically triggers policy reload via {@link PolicyLoader}</li>
+ * <li>Fail-safe operation - errors are logged but don't crash the service</li>
+ * <li>Supports distributed policy synchronization across service instances</li>
  * </ul>
  * 
- * <p>Message flow:</p>
+ * <p>
+ * Message flow:
+ * </p>
  * <ol>
- *   <li>Permission updated in database</li>
- *   <li>{@link PolicyEventPublisher} sends reload message to Redis</li>
- *   <li>This listener receives the message on configured channel</li>
- *   <li>{@link PolicyLoader} reloads policies from database</li>
- *   <li>Casbin enforcer is updated with fresh policies</li>
+ * <li>Permission updated in database</li>
+ * <li>Auth service's
+ * {@link com.defi.auth.permission.service.PolicyEventPublisher} sends reload
+ * message to Redis</li>
+ * <li>This listener receives the message on configured channel</li>
+ * <li>{@link PolicyLoader} reloads policies from database</li>
+ * <li>Casbin enforcer is updated with fresh policies</li>
  * </ol>
  * 
  * @author Defi Team
  * @since 1.0.0
- * @see PolicyEventPublisher
+ * @see com.defi.auth.permission.service.PolicyEventPublisher
  * @see PolicyLoader
  * @see PolicyEventConstant
  */
@@ -51,15 +63,19 @@ public class PolicyEventListener implements MessageListener {
     /**
      * Handles incoming Redis messages and processes policy reload events.
      * 
-     * <p>This method is called by Spring Data Redis when a message is received
+     * <p>
+     * This method is called by Spring Data Redis when a message is received
      * on the configured channel. It checks if the message is a policy reload
-     * request and triggers the appropriate action.</p>
+     * request and triggers the appropriate action.
+     * </p>
      * 
-     * <p>The method is designed to be resilient:</p>
+     * <p>
+     * The method is designed to be resilient:
+     * </p>
      * <ul>
-     *   <li>Unknown messages are ignored with debug logging</li>
-     *   <li>Exceptions are caught and logged without rethrowing</li>
-     *   <li>Successful reloads are logged for audit purposes</li>
+     * <li>Unknown messages are ignored with debug logging</li>
+     * <li>Exceptions are caught and logged without rethrowing</li>
+     * <li>Successful reloads are logged for audit purposes</li>
      * </ul>
      * 
      * @param message the Redis message containing the event data (non-null)
@@ -72,13 +88,13 @@ public class PolicyEventListener implements MessageListener {
             String channel = pattern != null ? new String(pattern) : "unknown";
             String messageBody = new String(message.getBody());
 
-            log.debug("Received message on channel: {} with content: {}", 
-            channel, messageBody);
-            
+            log.debug("Received message on channel: {} with content: {}",
+                    channel, messageBody);
+
             // Check if it's a reload message
             if (messageBody.startsWith(PolicyEventConstant.RELOAD_MESSAGE)) {
                 log.info("Processing policy reload event from channel: {}", channel);
-                
+
                 // Trigger policy reload directly
                 policyLoader.loadPolicies(enforcer);
                 log.info("Policy reload completed successfully");

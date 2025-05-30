@@ -4,8 +4,8 @@ import com.defi.auth.permission.dto.UpdateRolePermissionsRequest;
 import com.defi.auth.permission.entity.Permission;
 import com.defi.auth.permission.repository.PermissionRepository;
 import com.defi.auth.permission.service.PermissionService;
+import com.defi.auth.permission.service.PolicyEventPublisher;
 import com.defi.common.api.CommonMessage;
-import com.defi.common.casbin.event.PolicyEventPublisher;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +32,14 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission findById(Long id) {
         return permissionRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND)
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
     }
 
     @Override
     public List<Permission> findByRoleId(Long roleId) {
         return permissionRepository.findByRoleId(roleId);
     }
-    
+
     @Override
     public List<Permission> findByResourceId(Long resourceId) {
         return permissionRepository.findByResourceId(resourceId);
@@ -57,8 +55,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         // Create new permissions
         List<Permission> newPermissions = new ArrayList<>();
-        for (UpdateRolePermissionsRequest.ResourcePermission rp :
-         request.getResourcePermissions()) {
+        for (UpdateRolePermissionsRequest.ResourcePermission rp : request.getResourcePermissions()) {
             for (Long actionId : rp.getActionIds()) {
                 Permission permission = Permission.builder()
                         .roleId(request.getRoleId())
@@ -71,11 +68,11 @@ public class PermissionServiceImpl implements PermissionService {
 
         permissionRepository.saveAll(newPermissions);
         log.info("Created {} new permissions for role: {}",
-         newPermissions.size(), request.getRoleId());
+                newPermissions.size(), request.getRoleId());
 
         // Publish event to reload policies
         policyEventPublisher.publishReloadEvent();
-        
+
         return newPermissions.size();
     }
 }

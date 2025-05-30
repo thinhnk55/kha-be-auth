@@ -8,15 +8,21 @@ import lombok.NoArgsConstructor;
 /**
  * Represents a policy rule for Casbin authorization.
  * 
- * <p>This entity encapsulates the core elements of an access control policy rule
- * in the RBAC (Role-Based Access Control) model:</p>
+ * <p>
+ * This entity encapsulates the core elements of an access control policy rule
+ * in the RBAC (Role-Based Access Control) model:
+ * </p>
  * <ul>
- *   <li><strong>Subject</strong>: The role ID that is being granted access</li>
- *   <li><strong>Object</strong>: The resource code that access is being granted to</li>
- *   <li><strong>Action</strong>: The action code that specifies what can be done</li>
+ * <li><strong>Subject</strong>: The role ID that is being granted access</li>
+ * <li><strong>Object</strong>: The resource code that access is being granted
+ * to</li>
+ * <li><strong>Action</strong>: The action code that specifies what can be
+ * done</li>
  * </ul>
  * 
- * <p>Example policy rule: Role ID 1 can perform action "read" on resource "users"</p>
+ * <p>
+ * Example policy rule: Role ID 1 can perform action "read" on resource "users"
+ * </p>
  * 
  * @author Defi Team
  * @since 1.0.0
@@ -58,8 +64,11 @@ public class PolicyRule {
     /**
      * Converts this policy rule to Casbin policy format.
      * 
-     * <p>Casbin expects policies in the format: [subject, object, action]
-     * where subject is the role ID, object is the resource, and action is the operation.</p>
+     * <p>
+     * Casbin expects policies in the format: [subject, object, action]
+     * where subject is the role ID, object is the resource, and action is the
+     * operation.
+     * </p>
      * 
      * @return string array in Casbin format: [roleId, resourceCode, actionCode]
      */
