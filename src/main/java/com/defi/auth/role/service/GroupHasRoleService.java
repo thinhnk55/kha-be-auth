@@ -5,7 +5,7 @@ import com.defi.auth.role.entity.GroupHasRole;
 import java.util.List;
 
 public interface GroupHasRoleService {
-    void assignRoleToGroup(Long groupId, Long roleId);
+    void assignRoleListToGroup(Long groupId, List<Long> roleList);
 
     void removeRoleFromGroup(Long groupId, Long roleId);
 

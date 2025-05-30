@@ -1,5 +1,6 @@
 package com.defi.auth.role.service.impl;
 
+import com.defi.auth.group.repository.GroupRepository;
 import com.defi.auth.role.entity.GroupHasRole;
 import com.defi.auth.role.entity.GroupHasRoleId;
 import com.defi.auth.role.repository.GroupHasRoleRepository;
@@ -8,6 +9,7 @@ import com.defi.common.api.CommonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -17,17 +19,21 @@ import java.util.List;
 public class GroupHasRoleServiceImpl implements GroupHasRoleService {
 
     private final GroupHasRoleRepository groupHasRoleRepository;
+    private final GroupRepository groupRepository;
 
     @Override
-    public void assignRoleToGroup(Long groupId, Long roleId) {
-        GroupHasRoleId id = new GroupHasRoleId(groupId, roleId);
-        if (groupHasRoleRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);
+    @Transactional
+    public void assignRoleListToGroup(Long groupId, List<Long> roleList) {
+        if (!groupRepository.existsById(groupId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND);
         }
-        GroupHasRole entity = GroupHasRole.builder()
-                .id(id)
-                .build();
-        groupHasRoleRepository.save(entity);
+        List<GroupHasRole> toSave = roleList.stream()
+                .map(roleId -> GroupHasRole.builder()
+                        .id(new GroupHasRoleId(groupId, roleId))
+                        .build()
+                )
+                .toList();
+        groupHasRoleRepository.saveAll(toSave);
     }
 
     @Override
