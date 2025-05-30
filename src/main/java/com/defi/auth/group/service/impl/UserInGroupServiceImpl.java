@@ -34,11 +34,9 @@ public class UserInGroupServiceImpl implements UserInGroupService {
         if (!userRepository.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND);
         }
-
         if (!groupRepository.existsById(groupId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND);
         }
-
         UserInGroupId id = new UserInGroupId(userId, groupId);
         if (userInGroupRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CommonMessage.EXISTING);

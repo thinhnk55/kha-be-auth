@@ -24,6 +24,7 @@ import com.defi.common.config.JwtConfig;
 import com.defi.common.token.entity.TokenType;
 import com.defi.common.token.service.TokenIssuerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,7 +56,7 @@ public class PublicUserServiceImpl implements PublicUserService {
     public UserResponse register(CreateUserRequest req, String ipAddress, String userAgent) {
         User user = adminUserService.createUser(req);
         Session session = sessionService.createSession(user.getId(), ipAddress, userAgent, null);
-        if(session == null){
+        if (session == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, CommonMessage.LIMIT);
         }
         List<Long> roles = new LinkedList<>();
@@ -70,8 +71,7 @@ public class PublicUserServiceImpl implements PublicUserService {
                 user.getUserName(),
                 empty,
                 empty,
-                jwtConfig.getAccessTokenTimeToLive().toSeconds()
-        );
+                jwtConfig.getAccessTokenTimeToLive().toSeconds());
         String refreshToken = tokenIssuerService.generateToken(
                 String.valueOf(session.getId()),
                 TokenType.REFRESH_TOKEN,
@@ -79,8 +79,7 @@ public class PublicUserServiceImpl implements PublicUserService {
                 user.getUserName(),
                 empty,
                 empty,
-                jwtConfig.getRefreshTokenTimeToLive().toSeconds()
-        );
+                jwtConfig.getRefreshTokenTimeToLive().toSeconds());
         return mapper.toResponse(user, groups,
                 roles,
                 accessToken, refreshToken);
@@ -108,7 +107,7 @@ public class PublicUserServiceImpl implements PublicUserService {
 
         // 3. Lấy credential (PASSWORD)
         UserCredential credential = userCredentialRepository.findById(
-                        new UserCredentialId(user.getId(), UserCredentialType.PASSWORD.getValue()))
+                new UserCredentialId(user.getId(), UserCredentialType.PASSWORD.getValue()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, CommonMessage.UNAUTHORIZED));
 
         // 4. Kiểm tra password (salt + password, so với hash)
@@ -118,13 +117,13 @@ public class PublicUserServiceImpl implements PublicUserService {
             BaseResponse<?> response = BaseResponse.of(HttpStatus.BAD_REQUEST.value(),
                     CommonMessage.INVALID);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }else{
+        } else {
             loginFailureService.onSuccess(user.getUserName());
         }
 
         // 5. Tạo session
         Session session = sessionService.createSession(user.getId(), ipAddress, userAgent, null);
-        if(session == null){
+        if (session == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, CommonMessage.LIMIT);
         }
 
@@ -140,8 +139,7 @@ public class PublicUserServiceImpl implements PublicUserService {
                 user.getUserName(),
                 roles.stream().map(String::valueOf).toList(),
                 groups.stream().map(String::valueOf).toList(),
-                jwtConfig.getAccessTokenTimeToLive().toSeconds()
-        );
+                jwtConfig.getAccessTokenTimeToLive().toSeconds());
         String refreshToken = tokenIssuerService.generateToken(
                 String.valueOf(session.getId()),
                 TokenType.REFRESH_TOKEN,
@@ -149,17 +147,22 @@ public class PublicUserServiceImpl implements PublicUserService {
                 user.getUserName(),
                 roles.stream().map(String::valueOf).toList(),
                 groups.stream().map(String::valueOf).toList(),
-                jwtConfig.getRefreshTokenTimeToLive().toSeconds()
-        );
+                jwtConfig.getRefreshTokenTimeToLive().toSeconds());
 
         // 8. Map sang UserResponse
-        BaseResponse<UserResponse> response =  BaseResponse.of(mapper.toResponse(user, roles, groups, accessToken, refreshToken));
+        BaseResponse<UserResponse> response = BaseResponse
+                .of(mapper.toResponse(user, roles, groups, accessToken, refreshToken));
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public List<User> searchUsers(String keyword, Pageable pageable) {
+        return userRepository.searchUsers(keyword, pageable);
     }
 
     private void handleLoginFailure(User user) {
         long time = loginFailureService.onFailure(user.getUserName());
-        if(time > 0) {
+        if (time > 0) {
             user.setLocked(true);
             user.setLockedUntil(Instant.now().getEpochSecond() + time);
             userRepository.save(user);
