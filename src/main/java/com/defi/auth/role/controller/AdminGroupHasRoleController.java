@@ -32,31 +32,25 @@ public class AdminGroupHasRoleController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{groupId}/{roleId}")
     public ResponseEntity<BaseResponse<?>> removeRoleFromGroup(
-            @RequestBody GroupHasRoleDto request) {
-        groupHasRoleService.removeRoleFromGroup(request.getGroupId(), request.getRoleId());
+            @PathVariable Long groupId,
+            @PathVariable Long roleId) {
+        groupHasRoleService.removeRoleFromGroup(groupId, roleId);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/by-group")
-    public ResponseEntity<BaseResponse<List<GroupHasRole>>> findAllByIdGroupId(
-            @RequestParam Long groupId) {
-        List<GroupHasRole> list = groupHasRoleService.findAllByIdGroupId(groupId);
-        return ResponseEntity.ok(BaseResponse.of(list));
-    }
-
-    @GetMapping("/by-role")
-    public ResponseEntity<BaseResponse<List<GroupHasRole>>> findAllByIdRoleId(
-            @RequestParam Long roleId) {
-        List<GroupHasRole> list = groupHasRoleService.findAllByIdRoleId(roleId);
-        return ResponseEntity.ok(BaseResponse.of(list));
-    }
-
-    @GetMapping("/role-ids")
+    @GetMapping("/groups/{groupId}")
     public ResponseEntity<BaseResponse<List<Long>>> findRoleIdsByGroupId(
-            @RequestParam Long groupId) {
+            @PathVariable Long groupId) {
         List<Long> roleIds = groupHasRoleService.findRoleIdsByGroupId(groupId);
         return ResponseEntity.ok(BaseResponse.of(roleIds));
+    }
+
+    @GetMapping("/roles/{roleId}")
+    public ResponseEntity<BaseResponse<List<Long>>> findGroupIdsByRoleId(
+            @PathVariable Long roleId) {
+        List<Long> groupIds = groupHasRoleService.findGroupIdsByRoleId(roleId);
+        return ResponseEntity.ok(BaseResponse.of(groupIds));
     }
 }

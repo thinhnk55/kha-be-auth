@@ -63,4 +63,12 @@ public class GroupHasRoleServiceImpl implements GroupHasRoleService {
                 .map(groupHasRole -> groupHasRole.getId().getRoleId())
                 .toList();
     }
+
+    @Override
+    public List<Long> findGroupIdsByRoleId(Long roleId) {
+        return groupHasRoleRepository.findAllByIdRoleId(roleId)
+                .stream()
+                .map(groupHasRole -> groupHasRole.getId().getGroupId())
+                .toList();
+    }
 }

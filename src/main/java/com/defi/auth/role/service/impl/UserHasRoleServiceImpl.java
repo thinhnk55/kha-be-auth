@@ -60,7 +60,14 @@ public class UserHasRoleServiceImpl implements UserHasRoleService {
                 .userId(userId)
                 .build();
         return userHasRoleRepository.findById(id).orElseThrow(
-                ()->new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND)
-        );
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, CommonMessage.NOT_FOUND));
+    }
+
+    @Override
+    public List<Long> findUserIdsByRoleId(Long roleId) {
+        return userHasRoleRepository.findAllByIdRoleId(roleId)
+                .stream()
+                .map(userHasRole -> userHasRole.getId().getUserId())
+                .toList();
     }
 }

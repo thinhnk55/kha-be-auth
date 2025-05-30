@@ -73,7 +73,8 @@ public class AdminGroupController {
         Pagination pagination = Pagination.of(pageable);
         return ResponseEntity.ok(BaseResponse.of(users, pagination));
     }
-    @PutMapping("/{groupId}/users/{userId}")
+
+    @PostMapping("/{groupId}/users/{userId}")
     public ResponseEntity<BaseResponse<List<User>>> addUserToGroup(
             @PathVariable Long groupId,
             @PathVariable Long userId

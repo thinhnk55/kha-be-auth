@@ -16,4 +16,6 @@ public interface GroupHasRoleService {
     GroupHasRole getGroupHasRole(Long groupId, Long roleId);
 
     List<Long> findRoleIdsByGroupId(Long groupId);
+
+    List<Long> findGroupIdsByRoleId(Long roleId);
 }

@@ -20,41 +20,36 @@ public class AdminUserHasRoleController {
     @GetMapping("/{userId}/{roleId}")
     public ResponseEntity<BaseResponse<UserHasRole>> getUserHasRole(
             @PathVariable Long userId,
-            @PathVariable Long roleId
-    ) {
+            @PathVariable Long roleId) {
         UserHasRole userHasRole = userHasRoleService.getUserHasRole(userId, roleId);
         return ResponseEntity.ok(BaseResponse.of(userHasRole));
     }
 
     @PostMapping
     public ResponseEntity<BaseResponse<?>> assignRoleToUser(
-            @RequestBody UserHasRoleDto request
-    ) {
+            @RequestBody UserHasRoleDto request) {
         userHasRoleService.assignRoleToUser(request.getUserId(), request.getRoleId());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity<BaseResponse<?>> removeRoleFromUser(
-            @RequestBody UserHasRoleDto request
-    ) {
+            @RequestBody UserHasRoleDto request) {
         userHasRoleService.removeRoleFromUser(request.getUserId(), request.getRoleId());
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/by-user")
-    public ResponseEntity<BaseResponse<List<UserHasRole>>> findAllByIdUserId(
-            @RequestParam Long userId
-    ) {
-        List<UserHasRole> list = userHasRoleService.findAllByIdUserId(userId);
-        return ResponseEntity.ok(BaseResponse.of(list));
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<BaseResponse<List<Long>>> findRoleIdsByUserId(
+            @PathVariable Long userId) {
+        List<Long> roleIds = userHasRoleService.findRoleIdsByUserId(userId);
+        return ResponseEntity.ok(BaseResponse.of(roleIds));
     }
 
-    @GetMapping("/by-role")
-    public ResponseEntity<BaseResponse<List<UserHasRole>>> findAllByIdRoleId(
-            @RequestParam Long groupId
-    ) {
-        List<UserHasRole> list = userHasRoleService.findAllByIdRoleId(groupId);
-        return ResponseEntity.ok(BaseResponse.of(list));
+    @GetMapping("/roles/{roleId}")
+    public ResponseEntity<BaseResponse<List<Long>>> findUserIdsByRoleId(
+            @PathVariable Long roleId) {
+        List<Long> userIds = userHasRoleService.findUserIdsByRoleId(roleId);
+        return ResponseEntity.ok(BaseResponse.of(userIds));
     }
 }
