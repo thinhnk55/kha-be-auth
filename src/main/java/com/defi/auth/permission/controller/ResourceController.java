@@ -1,4 +1,4 @@
-package com.defi.auth.permission.controler;
+package com.defi.auth.permission.controller;
 
 import com.defi.auth.permission.dto.ResourceDto;
 import com.defi.auth.permission.dto.ResourceRequest;
@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/v1/admin/permissions/resources")
+@RequestMapping("/auth/v1/admin/resources")
 @RequiredArgsConstructor
 public class ResourceController {
 

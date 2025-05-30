@@ -39,7 +39,6 @@ public class ActionServiceImpl implements ActionService {
         return actionRepository.save(action);
     }
 
-
     @Override
     public Action update(Long id, ActionRequest request) {
         return actionRepository.findById(id).map(existing -> {

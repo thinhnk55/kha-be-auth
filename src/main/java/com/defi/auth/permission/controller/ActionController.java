@@ -1,4 +1,4 @@
-package com.defi.auth.permission.controler;
+package com.defi.auth.permission.controller;
 
 import com.defi.auth.permission.dto.ActionRequest;
 import com.defi.auth.permission.entity.Action;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth/v1/admin/permissions/actions")
+@RequestMapping("/auth/v1/admin/actions")
 @RequiredArgsConstructor
 public class ActionController {
 
