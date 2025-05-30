@@ -1,6 +1,5 @@
 package com.defi.auth.role.controller;
 
-import com.defi.auth.role.dto.GroupHasRoleDto;
 import com.defi.auth.role.entity.GroupHasRole;
 import com.defi.auth.role.service.GroupHasRoleService;
 import com.defi.common.api.BaseResponse;
@@ -25,10 +24,11 @@ public class AdminGroupHasRoleController {
         return ResponseEntity.ok(BaseResponse.of(groupHasRole));
     }
 
-    @PostMapping
+    @PostMapping("/{groupId}/roles")
     public ResponseEntity<BaseResponse<?>> assignRoleToGroup(
-            @RequestBody GroupHasRoleDto request) {
-        groupHasRoleService.assignRoleToGroup(request.getGroupId(), request.getRoleId());
+            @PathVariable Long groupId,
+            @RequestBody List<Long> roleList) {
+        groupHasRoleService.assignRoleListToGroup(groupId, roleList);
         return ResponseEntity.ok().build();
     }
 
