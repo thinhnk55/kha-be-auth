@@ -41,7 +41,8 @@ public class ResourceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<ResourceDto>> update(@PathVariable Long id, @RequestBody @Valid ResourceRequest request) {
+    public ResponseEntity<BaseResponse<ResourceDto>> update(@PathVariable Long id,
+            @RequestBody @Valid ResourceRequest request) {
         ResourceDto updated = resourceService.update(id, request);
         return ResponseEntity.ok(BaseResponse.of(updated));
     }

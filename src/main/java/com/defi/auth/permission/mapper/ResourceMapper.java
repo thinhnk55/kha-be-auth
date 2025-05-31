@@ -10,6 +10,9 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ResourceMapper {
 
+    @Mapping(target = "created_at", source = "resource.createdAt")
+    @Mapping(target = "updated_at", source = "resource.updatedAt")
+    @Mapping(target = "actions", source = "actions")
     ResourceDto toDto(Resource resource, List<Long> actions);
 
     Resource toEntity(ResourceRequest request);
