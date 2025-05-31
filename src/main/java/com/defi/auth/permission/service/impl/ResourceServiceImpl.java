@@ -51,8 +51,8 @@ public class ResourceServiceImpl implements ResourceService {
         resourceRepository.save(resource);
 
         List<ResourceHasAction> mappings;
-        if (request.getActionIds() != null && !request.getActionIds().isEmpty()) {
-            mappings = request.getActionIds().stream()
+        if (request.getActions() != null && !request.getActions().isEmpty()) {
+            mappings = request.getActions().stream()
                     .map(actionId -> ResourceHasAction.builder()
                             .id(ResourceHasActionId.builder()
                                     .resourceId(resource.getId())
@@ -84,8 +84,8 @@ public class ResourceServiceImpl implements ResourceService {
         resourceHasActionRepository.deleteByIdResourceId(resource.getId());
 
         List<ResourceHasAction> mappings;
-        if (request.getActionIds() != null && !request.getActionIds().isEmpty()) {
-            mappings = request.getActionIds().stream()
+        if (request.getActions() != null && !request.getActions().isEmpty()) {
+            mappings = request.getActions().stream()
                     .map(actionId -> ResourceHasAction.builder()
                             .id(ResourceHasActionId.builder()
                                     .resourceId(resource.getId())
