@@ -48,8 +48,8 @@ public class ResourceServiceImpl implements ResourceService {
 
             ResourceDto dto = new ResourceDto();
             dto.setId(((Number) row[0]).longValue());
-            dto.setCreated_at(((Number) row[1]).longValue());
-            dto.setUpdated_at(((Number) row[2]).longValue());
+            dto.setCreatedAt(((Number) row[1]).longValue());
+            dto.setUpdatedAt(((Number) row[2]).longValue());
             dto.setCode((String) row[3]);
             dto.setName((String) row[4]);
 
