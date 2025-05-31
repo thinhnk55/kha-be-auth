@@ -7,8 +7,8 @@ import java.util.List;
 @Data
 public class ResourceDto {
     private Long id;
-    private Long created_at;
-    private Long updated_at;
+    private Long createdAt;
+    private Long updatedAt;
     private String code;
     private String name;
     private ObjectNode metadata;
