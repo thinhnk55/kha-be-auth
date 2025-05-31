@@ -19,5 +19,5 @@ public class ResourceRequest {
 
     private ObjectNode metadata;
 
-    private List<Long> actionIds;
+    private List<Long> actions;
 }
